@@ -1,0 +1,45 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog">
+
+    <changeSet id="3" author="dmitriy sosnovich">
+        <createTable tableName="tb_user" remarks="All users">
+            <column name="id" type="BIGINT" remarks="unique identifier of the userEntity">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="email" type="VARCHAR(200)" remarks="email for userEntity">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="VARCHAR(129)" remarks="password">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(120)" remarks="comment"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="4" author="dmitriy sosnovich">
+        <createTable tableName="tb_user_external_project" remarks="External Project identifier for users">
+            <column name="projectId" type="VARCHAR(200)" remarks="identifier of external project">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT" remarks="unique identifier of the userEntity">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(120)" remarks="Name of external project">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="5" author="dmitriy sosnovich">
+        <addForeignKeyConstraint
+                baseTableName="tb_user_external_project"
+                baseColumnNames="user_id"
+                constraintName="fk_user_external_project_user"
+                referencedTableName="tb_user"
+                referencedColumnNames="id"/>
+    </changeSet>
+
+</databaseChangeLog>

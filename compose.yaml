@@ -1,45 +1,186 @@
-version: '3.8'
 services:
-  mysql:
+  database:
     image: 'mysql:latest'
     environment:
-      - 'MYSQL_DATABASE=mydatabase'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+      MYSQL_DATABASE: skyward
+      MYSQL_PASSWORD: toor
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_USER: skydmin
     ports:
       - '3306:3306'
+    networks:
+      - internal_network
+    dns:
+      - 8.8.8.8
+    healthcheck:
+      test: ["CMD-SHELL", "/usr/local/bin/mysql-healthcheck.sh || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - ./mysql-healthcheck.sh:/usr/local/bin/mysql-healthcheck.sh
+      - ./init-mysql.sql:/docker-entrypoint-initdb.d/init-mysql.sql
 
-  jaeger:
-    image: 'jaegertracing/all-in-one:latest'
-    ports:
-      - '5775:5775/udp'
-      - '6831:6831/udp'
-      - '6832:6832/udp'
-      - '5778:5778'
-      - '16686:16686'
-      - '14268:14268'
-      - '14250:14250'
-      - '9411:9411'
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+    image: 'docker.elastic.co/elasticsearch/elasticsearch-oss:7.10.2' # Use specific Elasticsearch OSS image
     environment:
-      - discovery.type=single-node
+      discovery.type: single-node # Run Elasticsearch in single-node mode
+      bootstrap.memory_lock: 'true' # Lock memory for Elasticsearch
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m" # Set Java heap size
+    ulimits:
+      memlock:
+        soft: -1 # Set unlimited soft memory lock
+        hard: -1 # Set unlimited hard memory lock
+    volumes:
+      - esdata:/usr/share/elasticsearch/data # Mount volume for data persistence
     ports:
-      - "9200:9200"
-      - "9300:9300"
+      - '9200:9200' # Expose Elasticsearch HTTP port
+    networks:
+      - internal_network # Connect to the internal network
+    dns:
+      - 8.8.8.8 # Set DNS server to Google's DNS
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:7.10.1
+    image: 'docker.elastic.co/kibana/kibana-oss:7.10.2' # Use specific Kibana OSS image
     environment:
-      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200 # Connect to Elasticsearch
     ports:
-      - "5601:5601"
+      - '5601:5601' # Expose Kibana port
+    depends_on:
+      - elasticsearch # Start after Elasticsearch
+    networks:
+      - internal_network # Connect to the internal network
+    dns:
+      - 8.8.8.8 # Set DNS server to Google's DNS
 
   logstash:
-    image: docker.elastic.co/logstash/logstash:7.10.1
-    ports:
-      - "5000:5000"
+    image: 'docker.elastic.co/logstash/logstash-oss:7.10.2' # Use specific Logstash OSS image
     volumes:
-      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf # Mount Logstash configuration
+    ports:
+      - '5044:5044' # Expose Logstash Beats input port
+      - '9600:9600' # Expose Logstash monitoring API port
+    networks:
+      - internal_network # Connect to the internal network
+    depends_on:
+      - elasticsearch # Start after Elasticsearch
+    dns:
+      - 8.8.8.8 # Set DNS server to Google's DNS
+
+
+  filebeat:
+    image: docker.elastic.co/beats/filebeat-oss:7.10.2 # Use specific Filebeat OSS image
+    user: root # Run as root user
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro # Mount Filebeat configuration
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro # Mount Docker containers directory
+      - /var/run/docker.sock:/var/run/docker.sock:ro # Mount Docker socket
+    networks:
+      - internal_network # Connect to the internal network
+    depends_on:
+      - logstash # Start after Logstash
+    dns:
+      - 8.8.8.8 # Set DNS server to Google's DNS
+    command: filebeat -e --strict.perms=false # Run Filebeat with specific options
+
+
+  jaeger:
+    image: 'jaegertracing/all-in-one:latest' # Use the latest Jaeger all-in-one image
+    ports:
+      - '5775:5775/udp' # Expose port for Thrift compact protocol
+      - '6831:6831/udp' # Expose port for Jaeger UDP collector
+      - '6832:6832/udp' # Expose port for Jaeger UDP collector
+      - '5778:5778' # Expose port for agent admin endpoint
+      - '16686:16686' # Expose Jaeger UI port
+      - '14268:14268' # Expose port for Jaeger HTTP collector
+      - '14250:14250' # Expose port for OTLP gRPC
+      - '9411:9411' # Expose port for Zipkin
+    networks:
+      - internal_network # Connect to the internal network
+    dns:
+      - 8.8.8.8 # Set DNS server to Google's DNS
+
+
+  grafana:
+    image: grafana/grafana:latest # Use the latest Grafana image
+    ports:
+      - '3000:3000' # Expose Grafana port
+    networks:
+      - internal_network # Connect to the internal network
+    dns:
+      - 8.8.8.8 # Set DNS server to Google's DNS
+      - 1.1.1.1 # Set secondary DNS server to Cloudflare's DNS
+    depends_on:
+      - prometheus # Start after Prometheus
+
+  prometheus:
+    image: prom/prometheus:latest # Use the latest Prometheus image
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml # Mount Prometheus configuration
+    ports:
+      - '9090:9090' # Expose Prometheus port
+    networks:
+      - internal_network # Connect to the internal network
+    dns:
+      - 8.8.8.8 # Set DNS server to Google's DNS
+
+  skyward-app:
+    image: docker.io/library/skyward-server:latest # Use the latest Skyward server image
+    depends_on:
+      database:
+        condition: service_healthy # Start after database is healthy
+
+    environment:
+      - LOGSTASH_HOST=logstash
+       # Set server port
+      - server.port=8080
+       # Set Spring application name
+      - spring.application.name=skyward
+      # Set Jersey type to filter
+      - spring.jersey.type=filter
+       # Set Jersey application path
+      - spring.jersey.application-path=/api
+      - spring.datasource.url=jdbc:mysql://database:3306/skyward
+      - spring.datasource.username=skydmin
+      - spring.datasource.password=toor
+       # Set MySQL driver class name
+      - spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+       # Set JWT secret key
+      - security.jwt.token.secret-key=hH0FDYs6EOmA7kV1M46vp4Bb29PvQrfVhuCxEgYfPpo=
+
+       # Set JWT token expiration length
+      - security.jwt.token.expire-length=3600000
+       # Set Prometheus URL
+      - management.metrics.export.prometheus.url=http://prometheus:9090
+       # Expose management endpoints
+      - management.endpoints.web.exposure.include=health,info,prometheus
+       # Enable Prometheus metrics export
+      - management.prometheus.metrics.export.enabled=true
+      - otel.resource.attributes=service.name=skyward-app
+      - otel.traces.exporter=otlp
+       # Update this to match the OTLP gRPC port
+      - otel.exporter.otlp.endpoint=http://jaeger:14250
+      - otel.java.global-autoconfigure.enabled=true
+      - spring.profiles.docker=spring.profiles.active=docker
+      - logging.config=classpath:logback-docker-spring.xml
+    ports:
+      - "8080:8080" # Expose application port
+    networks:
+      - internal_network # Connect to the internal network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://skyward-app:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+networks:
+  internal_network:
+    driver: bridge
+
+volumes:
+  esdata:
+    driver: local
+  registry:
+    driver: local

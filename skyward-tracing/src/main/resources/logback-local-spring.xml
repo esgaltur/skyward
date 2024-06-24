@@ -1,0 +1,27 @@
+<configuration>
+    <appender name="LOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <destination>127.0.0.1:5044</destination>
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <customFields>{"application":"skyward"}</customFields>
+        </encoder>
+    </appender>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+            <includeMdcKeyName>trace.id</includeMdcKeyName>
+            <includeMdcKeyName>span.id</includeMdcKeyName>
+            <includeMdcKeyName>http.request.method</includeMdcKeyName>
+            <includeMdcKeyName>http.request.uri</includeMdcKeyName>
+            <includeMdcKeyName>http.request.body</includeMdcKeyName>
+            <includeMdcKeyName>http.request.headers</includeMdcKeyName>
+            <includeMdcKeyName>http.response.status</includeMdcKeyName>
+            <includeMdcKeyName>http.response.body</includeMdcKeyName>
+            <includeMdcKeyName>http.response.headers</includeMdcKeyName>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="LOGSTASH"/>
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>

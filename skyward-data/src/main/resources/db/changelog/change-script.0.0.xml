@@ -1,0 +1,23 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+    <changeSet id="0" author="Dmitriy Sosnovich">
+        <sql>
+            CREATE DATABASE IF NOT EXISTS skyward;
+        </sql>
+    </changeSet>
+    <changeSet id="1" author="Dmitriy Sosnovich">
+        <sql>
+            CREATE USER 'skydmin'@'%' IDENTIFIED BY 'toor';
+        </sql>
+    </changeSet>
+
+    <changeSet id="2" author="Dmitriy Sosnovich">
+        <sql>
+            GRANT ALL PRIVILEGES ON skyward.* TO 'skydmin'@'%';
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

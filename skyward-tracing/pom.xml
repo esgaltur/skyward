@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -12,33 +12,74 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>skyward-tracing</name>
     <description>skyward-tracing</description>
-    <url/>
-    <licenses>
-        <license/>
-    </licenses>
-    <developers>
-        <developer/>
-    </developers>
-    <scm>
-        <connection/>
-        <developerConnection/>
-        <tag/>
-        <url/>
-    </scm>
     <properties>
         <java.version>17</java.version>
+        <opentelemetry.version>1.39.0</opentelemetry.version>
+        <grpc-netty-shaded.version>1.64.0</grpc-netty-shaded.version>
+        <opentelemetry-exporter-jaeger.version>1.34.1</opentelemetry-exporter-jaeger.version>
+        <opentelemetry-semconv.version>1.25.0-alpha</opentelemetry-semconv.version>
+        <opentelemetry-extension-annotations.version>1.18.0</opentelemetry-extension-annotations.version>
+        <opentelemetry-spring-boot-starter.version>2.5.0-alpha</opentelemetry-spring-boot-starter.version>
     </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
 
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
+
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+            </dependency>
+
+            <!-- OpenTelemetry SDK -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-sdk</artifactId>
+            </dependency>
+
+            <!-- OpenTelemetry Exporter for OTLP -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-exporter-otlp</artifactId>
+            </dependency>
+
+            <!-- OpenTelemetry Instrumentation API -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-api</artifactId>
+            </dependency>
+
+            <!-- OpenTelemetry Instrumentation Annotations (optional) -->
+            <!-- https://mvnrepository.com/artifact/io.opentelemetry/opentelemetry-extension-annotations -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-extension-annotations</artifactId>
+                <version>${opentelemetry-extension-annotations.version}</version>
+            </dependency>
+
+
+            <!-- Logging (optional) -->
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-exporter-logging</artifactId>
+            </dependency>
+
+
+            <dependency>
+                <groupId>io.grpc</groupId>
+                <artifactId>grpc-netty-shaded</artifactId>
+                <version>${grpc-netty-shaded.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.micrometer</groupId>
+                <artifactId>micrometer-registry-prometheus</artifactId>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.opentelemetry</groupId>
+                <artifactId>opentelemetry-semconv</artifactId>
+                <version>${opentelemetry-semconv.version}</version>
+                <scope>compile</scope>
+            </dependency>
+        </dependencies>
+
 
 </project>

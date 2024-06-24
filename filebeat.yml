@@ -1,0 +1,14 @@
+filebeat.inputs:  # Define the inputs for Filebeat
+  - type: container  # Specify the input type as container to read logs from Docker containers
+    exclude_files: [ '\.gz$' ]
+    paths:  # Define the paths to the log files
+      - /var/lib/docker/containers/*/*.log  # Path pattern to match log files from all Docker containers
+
+processors:  # Define processors to apply to the logs
+  - add_docker_metadata: ~  # Add Docker metadata (like container name, image name) to the logs
+
+output.logstash:  # Define the output destination for the logs
+  hosts: ["logstash:5044"]
+  max_retries: -1  # infinite retries
+  backoff.init: 1s
+  backoff.max: 60s

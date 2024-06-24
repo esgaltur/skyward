@@ -1,0 +1,106 @@
+@startuml
+!define ENTITY(entityName) class entityName << (E,#FFAAAA) Entity >>
+!define REPOSITORY(repositoryName) class repositoryName << (R,#AAAAFF) Repository >>
+!define SERVICE(serviceName) class serviceName << (S,#AAFFAA) Service >>
+!define CONFIG(configName) class configName << (C,#FFD700) Config >>
+!define FILTER(filterName) class filterName << (F,#FFD700) Filter >>
+!define CONTROLLER(controllerName) class controllerName << (C,#FFDD44) Controller >>
+
+package com.sosnovich.skyward.data.model {
+    ENTITY(UserEntity) {
+        +Long id
+        +String email
+        +String password
+        +String name
+        +String role
+        +boolean accountExpired
+        +boolean accountLocked
+        +boolean credentialsExpired
+        +boolean disabled
+        +Set<UserExternalProjectEntity> externalProjects
+    }
+
+    ENTITY(UserExternalProjectEntity) {
+        +Long id
+        +String projectId
+        +UserEntity user
+        +String name
+    }
+}
+
+package com.sosnovich.skyward.data.repository {
+    REPOSITORY(UserRepository) {
+        +findByEmail(String email) : Optional<UserEntity>
+    }
+
+    REPOSITORY(UserExternalProjectRepository) {
+        +findByUserId(Long userId) : List<UserExternalProjectEntity>
+    }
+}
+
+package com.sosnovich.skyward.security {
+    SERVICE(UserDetailsServiceImpl) {
+        -UserRepository userRepository
+        +loadUserByUsername(String email) : UserDetails
+    }
+
+    CONFIG(SecurityConfig) {
+        +PasswordEncoder passwordEncoder()
+        +SecurityFilterChain securityFilterChain(HttpSecurity http) : SecurityFilterChain
+        +AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) : AuthenticationManager
+    }
+
+    class JwtTokenProvider
+    class JwtTokenFilter
+}
+
+package com.sosnovich.skyward.service {
+    SERVICE(UserService) {
+        +createUser(NewUser newUser) : CompletableFuture<User>
+        +getUserById(Long id) : CompletableFuture<Optional<User>>
+        +deleteUser(Long id)
+        +addProjectToUser(Long userId, NewExternalProject newProject) : CompletableFuture<ExternalProject>
+        +getProjectsByUserId(Long userId) : CompletableFuture<List<ExternalProject>>
+    }
+}
+
+package com.sosnovich.skyward.tracing {
+    CONFIG(OpenTelemetryConfig) {
+        +OpenTelemetry openTelemetry() : OpenTelemetry
+        +Tracer tracer(OpenTelemetry openTelemetry) : Tracer
+    }
+
+    FILTER(TraceFilter) {
+        -Tracer tracer
+        +filter(ContainerRequestContext requestContext) : void
+        +filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) : void
+    }
+}
+
+package com.sosnovich.skyward.api {
+    CONTROLLER(UserController) {
+        +createUser(NewUser newUser) : CompletableFuture<Response>
+        +getUserById(Long id) : CompletableFuture<Response>
+        +deleteUser(Long id) : Response
+        +addProjectToUser(Long userId, NewExternalProject newProject) : CompletableFuture<Response>
+        +getProjectsByUserId(Long userId) : CompletableFuture<Response>
+    }
+}
+
+UserDetailsServiceImpl --> UserRepository
+UserDetailsServiceImpl --> JwtTokenProvider
+UserDetailsServiceImpl --> JwtTokenFilter
+SecurityConfig --> UserDetailsServiceImpl
+SecurityConfig --> JwtTokenProvider
+SecurityConfig --> JwtTokenFilter
+
+UserService --> UserRepository
+UserService --> UserExternalProjectRepository
+
+TraceFilter --> OpenTelemetryConfig
+TraceFilter --> Tracer
+
+UserController --> UserService
+UserController --> UserDetailsServiceImpl
+
+@enduml

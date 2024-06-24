@@ -11,7 +11,8 @@
     <artifactId>skyward-openapi</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>skyward-openapi</name>
-    <description>skyward-openapi</description>
+    <description>skyward-model</description>
+    <packaging>jar</packaging>
     <url/>
     <licenses>
         <license/>
@@ -34,19 +35,16 @@
         <!--        this version is not last, but compatible with the openapi-generator maven plugin-->
         <swagger-annotations.version>1.6.12</swagger-annotations.version>
         <openapi-generator-maven-plugin.version>7.1.0</openapi-generator-maven-plugin.version>
-        <openapi-generator-maven-plugin.inputSpec>${project.basedir}/src/main/resources/api-docs.v3.yaml
+        <openapi-generator-maven-plugin.inputSpec>${project.basedir}/src/main/resources/api-spec.yaml
         </openapi-generator-maven-plugin.inputSpec>
-        <openapi-generator-maven-plugin.apiPackage>com.example.demo.openapi.api
+        <openapi-generator-maven-plugin.apiPackage>com.sosnovich.skyward.openapi.api
         </openapi-generator-maven-plugin.apiPackage>
-        <openapi-generator-maven-plugin.modelPackage>com.example.demo.openapi.model
+        <openapi-generator-maven-plugin.modelPackage>com.sosnovich.skyward.openapi.model
         </openapi-generator-maven-plugin.modelPackage>
         <openapi-generator-maven-plugin.artifactVersion>1.0.0</openapi-generator-maven-plugin.artifactVersion>
-        <openapi-generator-maven-plugin.groupId>com.example.demo</openapi-generator-maven-plugin.groupId>
+        <openapi-generator-maven-plugin.groupId>com.sosnovich.skyward</openapi-generator-maven-plugin.groupId>
         <openapi-generator-maven-plugin.artifactId>openapi-model</openapi-generator-maven-plugin.artifactId>
-        <jackson.version>2.16.0</jackson.version>
-        <org.springframework.boot.version>3.2.0</org.springframework.boot.version>
-
-
+        <jackson.version>2.17.1</jackson.version>
     </properties>
 
     <dependencies>
@@ -56,7 +54,6 @@
             <artifactId>jakarta.jakartaee-api</artifactId>
             <version>${jakarta.jakartaee-api.version}</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/io.swagger/swagger-annotations -->
         <!-- https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations -->
         <dependency>
             <groupId>io.swagger</groupId>
@@ -120,6 +117,7 @@
                             <generatorName>jaxrs-spec</generatorName>
 
                             <configOptions>
+                                <useBeanValidation>true</useBeanValidation>
                                 <annotationLibrary>swagger2</annotationLibrary>
                                 <interfaceOnly>true</interfaceOnly>
                                 <returnResponse>true</returnResponse>
@@ -128,8 +126,8 @@
                                 <booleanGetterPrefix>is</booleanGetterPrefix>
                                 <serializableModel>true</serializableModel>
                                 <sourceFolder>src/main/java</sourceFolder>
-                                <name>openapi-example-model</name>
-                                <title>openapi-example-model</title>
+                                <name>openapi-skyward-model</name>
+                                <title>openapi-skyward-model</title>
                                 <groupId>${openapi-generator-maven-plugin.groupId}</groupId>
                                 <artifactId>${openapi-generator-maven-plugin.artifactId}</artifactId>
                                 <artifactVersion>${openapi-generator-maven-plugin.artifactVersion}</artifactVersion>
@@ -147,13 +145,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>${org.springframework.boot.version}</version>
-            </plugin>
-        </plugins>
+         </plugins>
     </build>
     <repositories>
         <repository>

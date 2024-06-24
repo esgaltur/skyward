@@ -1,0 +1,43 @@
+@startuml
+actor User
+
+package "Application" {
+  [skyward-app]
+}
+
+package "Database" {
+  [skyward-database-1]
+}
+
+package "Logging" {
+  [skyward-filebeat-1]
+  [skyward-logstash-1]
+  [skyward-elasticsearch-1]
+  [skyward-kibana-1]
+}
+
+package "Metrics" {
+  [skyward-prometheus-1]
+  [skyward-grafana-1]
+}
+
+package "Tracing" {
+  [skyward-jaeger-1]
+}
+
+User --> [skyward-app] : Uses
+[skyward-app] --> [skyward-database-1] : Database Operations
+
+[skyward-app] --> [skyward-filebeat-1] : Sends Logs
+[skyward-filebeat-1] --> [skyward-logstash-1] : Forwards Logs
+[skyward-logstash-1] --> [skyward-elasticsearch-1] : Sends Processed Logs
+[skyward-kibana-1] --> [skyward-elasticsearch-1] : Queries Logs
+User --> [skyward-kibana-1] : Views Logs
+
+[skyward-app] --> [skyward-prometheus-1] : Sends Metrics
+[skyward-grafana-1] --> [skyward-prometheus-1] : Queries Metrics
+User --> [skyward-grafana-1] : Views Metrics
+
+[skyward-app] --> [skyward-jaeger-1] : Sends Trace Data
+User --> [skyward-jaeger-1] : Views Traces
+@enduml

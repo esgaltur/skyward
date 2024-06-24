@@ -12,107 +12,29 @@ paths:
       summary: Authenticate user and generate JWT token
       operationId: authenticateUser
       requestBody:
-        description: User credentials
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Credentials'
-            examples:
-              example-1:
-                summary: Valid credentials
-                value:
-                  email: "user@example.com"
-                  password: "password123"
+        $ref: '#/components/requestBodies/Credentials'
       responses:
         '200':
-          description: Successfully authenticated
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthResponse'
-              examples:
-                example-1:
-                  value:
-                    token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+          $ref: '#/components/responses/AuthResponse'
         '401':
-          description: Unauthorized
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: Unauthorized
-              examples:
-                example-1:
-                  value:
-                    error: "Unauthorized"
+          $ref: '#/components/responses/UnauthorizedError'
   /users:
     post:
       summary: Create a new user
       operationId: createUser
       requestBody:
-        description: New user data
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewUser'
-            examples:
-              example-1:
-                value:
-                  email: "newuser@example.com"
-                  password: "newpassword123"
-                  name: "New User"
+        $ref: '#/components/requestBodies/NewUser'
       responses:
         '201':
-          description: Successfully created user
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-              examples:
-                example-1:
-                  value:
-                    id: 1
-                    email: "newuser@example.com"
-                    name: "New User"
+          $ref: '#/components/responses/UserCreated'
         '400':
-          description: Invalid input
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Invalid input data"
-              examples:
-                example-1:
-                  value:
-                    error: "Invalid input data"
+          $ref: '#/components/responses/InvalidInputError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '409':
+          $ref: '#/components/responses/EmailInUseError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /users/{id}:
     get:
       summary: Retrieve user information
@@ -127,60 +49,15 @@ paths:
         - bearerAuth: []
       responses:
         '200':
-          description: Successfully retrieved user
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/User'
-              examples:
-                example-1:
-                  value:
-                    id: 1
-                    email: "user@example.com"
-                    name: "Existing User"
+          $ref: '#/components/responses/UserResponse'
         '401':
-          description: Unauthorized
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Unauthorized"
-              examples:
-                example-1:
-                  value:
-                    error: "Unauthorized"
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '404':
-          description: User not found
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "User not found"
-              examples:
-                example-1:
-                  value:
-                    error: "User not found"
+          $ref: '#/components/responses/UserNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
       summary: Delete a user
       operationId: deleteUser
@@ -193,51 +70,21 @@ paths:
       security:
         - bearerAuth: []
       responses:
-        '200':
+        '204':
           description: Successfully deleted user
           headers:
-            trace-id:
+            trace.id:
               description: Trace ID for the request
               schema:
                 type: string
         '401':
-          description: Unauthorized
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Unauthorized"
-              examples:
-                example-1:
-                  value:
-                    error: "Unauthorized"
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '404':
-          description: User not found
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "User not found"
-              examples:
-                example-1:
-                  value:
-                    error: "User not found"
+          $ref: '#/components/responses/UserNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /users/{id}/projects:
     post:
       summary: Add external project to a user
@@ -251,54 +98,18 @@ paths:
       security:
         - bearerAuth: []
       requestBody:
-        description: New external project data
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/NewExternalProject'
-            examples:
-              example-1:
-                value:
-                  id: "project1"
-                  name: "Project One"
+        $ref: '#/components/requestBodies/NewExternalProject'
       responses:
         '201':
-          description: Successfully added external project
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ExternalProject'
-              examples:
-                example-1:
-                  value:
-                    id: "project1"
-                    user_id: 1
-                    name: "Project One"
+          $ref: '#/components/responses/ExternalProjectCreated'
         '400':
-          description: Invalid input
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Invalid input data"
-              examples:
-                example-1:
-                  value:
-                    error: "Invalid input data"
+          $ref: '#/components/responses/InvalidInputError'
+        '409':
+          $ref: '#/components/responses/ProjectAlreadyExistsError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     get:
       summary: Retrieve external projects from a user
       operationId: getExternalProjects
@@ -312,65 +123,15 @@ paths:
         - bearerAuth: []
       responses:
         '200':
-          description: Successfully retrieved external projects
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ExternalProject'
-              examples:
-                example-1:
-                  value:
-                    - id: "project1"
-                      user_id: 1
-                      name: "Project One"
-                    - id: "project2"
-                      user_id: 1
-                      name: "Project Two"
+          $ref: '#/components/responses/ExternalProjectsResponse'
         '401':
-          description: Unauthorized
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Unauthorized"
-              examples:
-                example-1:
-                  value:
-                    error: "Unauthorized"
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
         '404':
-          description: User not found
-          headers:
-            trace-id:
-              description: Trace ID for the request
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "User not found"
-              examples:
-                example-1:
-                  value:
-                    error: "User not found"
+          $ref: '#/components/responses/UserNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 components:
   securitySchemes:
     bearerAuth:
@@ -383,6 +144,7 @@ components:
       properties:
         email:
           type: string
+          format: email
         password:
           type: string
       example:
@@ -401,17 +163,23 @@ components:
           type: integer
         email:
           type: string
+          format: email
         name:
           type: string
       example:
         id: 1
         email: "user@example.com"
         name: "John Doe"
+      required:
+        - id
+        - email
+        - name
     NewUser:
       type: object
       properties:
         email:
           type: string
+          format: email
         password:
           type: string
         name:
@@ -420,6 +188,10 @@ components:
         email: "newuser@example.com"
         password: "newpassword123"
         name: "New User"
+      required:
+        - email
+        - password
+        - name
     ExternalProject:
       type: object
       properties:
@@ -440,8 +212,299 @@ components:
           type: string
         name:
           type: string
+      required:
+        - id
+        - name
       example:
         id: "project1"
         name: "Project One"
-security:
-  - bearerAuth: []
+    ForbiddenResponseBody:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Forbidden"
+        message:
+          type: string
+          example: "You do not have permission to access this resource."
+    InternalServerErrorBody:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Internal Server Error"
+    EmailInUseErrorBody:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Email is already in use"
+    InvalidInputErrorBody:
+      type: object
+      properties:
+        field:
+          type: string
+          example: "Entity.id"
+        message:
+          type: string
+          example: "field should not be null"
+        rejectedValue:
+          type: string
+          example: "null"
+    ProjectAlreadyExistBody:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Project with id [1] already exist"
+    UnauthorizedBody:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Unauthorized access. Please provide valid credentials."
+  requestBodies:
+    Credentials:
+      description: User credentials
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Credentials'
+          examples:
+            example-1:
+              summary: Valid credentials
+              value:
+                email: "user@example.com"
+                password: "password123"
+    NewUser:
+      description: New user data
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewUser'
+          examples:
+            example-1:
+              value:
+                email: "newuser@example.com"
+                password: "newpassword123"
+                name: "New User"
+    NewExternalProject:
+      description: New external project data
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewExternalProject'
+          examples:
+            example-1:
+              value:
+                id: "project1"
+                name: "Project One"
+  responses:
+    AuthResponse:
+      description: Successfully authenticated
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AuthResponse'
+          examples:
+            example-1:
+              value:
+                token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+    UserResponse:
+      description: Successfully retrieved user
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+          examples:
+            example-1:
+              value:
+                id: 1
+                email: "user@example.com"
+                name: "Existing User"
+    UserCreated:
+      description: Successfully created user
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+          examples:
+            example-1:
+              value:
+                id: 1
+                email: "newuser@example.com"
+                name: "New User"
+    ExternalProjectCreated:
+      description: Successfully added external project
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ExternalProject'
+          examples:
+            example-1:
+              value:
+                id: "project1"
+                user_id: 1
+                name: "Project One"
+    ExternalProjectsResponse:
+      description: Successfully retrieved external projects
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/ExternalProject'
+          examples:
+            example-1:
+              value:
+                - id: "project1"
+                  user_id: 1
+                  name: "Project One"
+                - id: "project2"
+                  user_id: 1
+                  name: "Project Two"
+    UnauthorizedError:
+      description: Unauthorized access
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UnauthorizedBody'
+          examples:
+            example-1:
+              value:
+                error: "Unauthorized access. Please provide valid credentials."
+    UserNotFoundError:
+      description: User not found
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "User not found"
+          examples:
+            example-1:
+              value:
+                error: "User not found"
+    InvalidInputError:
+      description: Invalid input data
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/InvalidInputErrorBody"
+          examples:
+            example-1:
+              value:
+                - field: "email"
+                  message: "must be a well-formed email address"
+                  rejectedValue: "invalid-email"
+                - field: "password"
+                  message: "must not be null"
+                  rejectedValue: "null"
+    EmailInUseError:
+      description: Email is already in use
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EmailInUseErrorBody"
+          examples:
+            example-1:
+              value:
+                error: "Email is already in use"
+    ProjectAlreadyExistsError:
+      description: Project already exists
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProjectAlreadyExistBody"
+          examples:
+            example-1:
+              value:
+                error: "Project with id [project1] already exists"
+    InternalServerError:
+      description: Internal Server Error
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/InternalServerErrorBody"
+          examples:
+            example-1:
+              value:
+                error: "Internal Server Error"
+    ForbiddenError:
+      description: Forbidden access
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ForbiddenResponseBody"
+          examples:
+            example-1:
+              value:
+                error: "Forbidden"
+                message: "You do not have permission to access this resource."
