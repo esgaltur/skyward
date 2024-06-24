@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.sosnovich</groupId>
+        <artifactId>skyward-parent</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <artifactId>skyward-openapi</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>skyward-openapi</name>
+    <description>skyward-openapi</description>
+    <url/>
+    <licenses>
+        <license/>
+    </licenses>
+    <developers>
+        <developer/>
+    </developers>
+    <scm>
+        <connection/>
+        <developerConnection/>
+        <tag/>
+        <url/>
+    </scm>
+    <properties>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <jackson-databind-nullable.version>0.2.6</jackson-databind-nullable.version>
+        <!--        this version is not last, but compatible with the openapi-generator maven plugin-->
+        <swagger-annotations.version>1.6.12</swagger-annotations.version>
+        <openapi-generator-maven-plugin.version>7.1.0</openapi-generator-maven-plugin.version>
+        <openapi-generator-maven-plugin.inputSpec>${project.basedir}/src/main/resources/api-docs.v3.yaml
+        </openapi-generator-maven-plugin.inputSpec>
+        <openapi-generator-maven-plugin.apiPackage>com.example.demo.openapi.api
+        </openapi-generator-maven-plugin.apiPackage>
+        <openapi-generator-maven-plugin.modelPackage>com.example.demo.openapi.model
+        </openapi-generator-maven-plugin.modelPackage>
+        <openapi-generator-maven-plugin.artifactVersion>1.0.0</openapi-generator-maven-plugin.artifactVersion>
+        <openapi-generator-maven-plugin.groupId>com.example.demo</openapi-generator-maven-plugin.groupId>
+        <openapi-generator-maven-plugin.artifactId>openapi-model</openapi-generator-maven-plugin.artifactId>
+        <jackson.version>2.16.0</jackson.version>
+        <org.springframework.boot.version>3.2.0</org.springframework.boot.version>
+
+
+    </properties>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>jakarta.platform</groupId>
+            <artifactId>jakarta.jakartaee-api</artifactId>
+            <version>${jakarta.jakartaee-api.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.swagger/swagger-annotations -->
+        <!-- https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-annotations -->
+        <dependency>
+            <groupId>io.swagger</groupId>
+            <artifactId>swagger-core</artifactId>
+            <version>${swagger-annotations.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-core -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.core/jackson-databind -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.openapitools/jackson-databind-nullable -->
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>${jackson-databind-nullable.version}</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
+
+    </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>${openapi-generator-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>
+                                ${openapi-generator-maven-plugin.inputSpec}
+                            </inputSpec>
+                            <generatorName>jaxrs-spec</generatorName>
+
+                            <configOptions>
+                                <annotationLibrary>swagger2</annotationLibrary>
+                                <interfaceOnly>true</interfaceOnly>
+                                <returnResponse>true</returnResponse>
+                                <useSwaggerAnnotations>true</useSwaggerAnnotations>
+                                <useJakartaEe>true</useJakartaEe>
+                                <booleanGetterPrefix>is</booleanGetterPrefix>
+                                <serializableModel>true</serializableModel>
+                                <sourceFolder>src/main/java</sourceFolder>
+                                <name>openapi-example-model</name>
+                                <title>openapi-example-model</title>
+                                <groupId>${openapi-generator-maven-plugin.groupId}</groupId>
+                                <artifactId>${openapi-generator-maven-plugin.artifactId}</artifactId>
+                                <artifactVersion>${openapi-generator-maven-plugin.artifactVersion}</artifactVersion>
+                                <apiPackage>${openapi-generator-maven-plugin.apiPackage}</apiPackage>
+                                <modelPackage>${openapi-generator-maven-plugin.modelPackage}</modelPackage>
+                                <dateLibrary>java8</dateLibrary>
+                                <additionalModelTypeAnnotations>
+                                    @lombok.NoArgsConstructor
+                                    @lombok.AllArgsConstructor
+                                </additionalModelTypeAnnotations>
+                                <useSwaggerAnnotations>true</useSwaggerAnnotations>
+                            </configOptions>
+                            <typeMappings>integer=Long,int=Long</typeMappings>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${org.springframework.boot.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+    <repositories>
+        <repository>
+            <id>maven_central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2/</url>
+        </repository>
+    </repositories>
+</project>
