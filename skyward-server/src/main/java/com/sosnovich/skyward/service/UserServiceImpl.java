@@ -1,4 +1,3 @@
-// src/main/java/com/sosnovich/skyward/service/UserServiceImpl.java
 package com.sosnovich.skyward.service;
 
 import com.sosnovich.skyward.data.model.UserEntity;
@@ -26,6 +25,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Service implementation for handling user and project-related operations.
+ */
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -35,6 +37,15 @@ public class UserServiceImpl implements UserService {
     private final ProjectMapper projectMapper;
     private final PasswordEncoder bCryptPasswordEncoder;
 
+    /**
+     * Constructs a new UserServiceImpl.
+     *
+     * @param userRepository                 the repository for user entities
+     * @param userExternalProjectRepository  the repository for user external project entities
+     * @param userMapper                     the mapper for user entities and DTOs
+     * @param projectMapper                  the mapper for project entities and DTOs
+     * @param bCryptPasswordEncoder          the password encoder
+     */
     @Autowired
     public UserServiceImpl(UserRepository userRepository, UserExternalProjectRepository userExternalProjectRepository, UserMapper userMapper, ProjectMapper projectMapper,
                            PasswordEncoder bCryptPasswordEncoder) {
@@ -45,6 +56,12 @@ public class UserServiceImpl implements UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
+    /**
+     * Creates a new user.
+     *
+     * @param newUser the new user to be created
+     * @return a CompletableFuture containing the created user
+     */
     @Async
     @Override
     public CompletableFuture<User> createUser(NewUser newUser) {
@@ -58,22 +75,40 @@ public class UserServiceImpl implements UserService {
         });
     }
 
+    /**
+     * Retrieves a user by their ID.
+     *
+     * @param id the ID of the user to retrieve
+     * @return a CompletableFuture containing an Optional with the retrieved user, if found
+     */
     @Async
     @Override
     public CompletableFuture<Optional<User>> getUserById(Long id) {
-        return CompletableFuture.supplyAsync(() ->             // Fetch user info logic here
-             userRepository.findById(id)
-                    .map(userMapper::toDTO)
-                    .map(userMapper::toApiModel)
+        return CompletableFuture.supplyAsync(() ->
+                userRepository.findById(id)
+                        .map(userMapper::toDTO)
+                        .map(userMapper::toApiModel)
         );
     }
 
+    /**
+     * Deletes a user by their ID.
+     *
+     * @param userId the ID of the user to delete
+     */
     @Async
     @Override
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
     }
 
+    /**
+     * Adds a new external project to a user.
+     *
+     * @param userId     the ID of the user to add the project to
+     * @param newProject the new external project to add
+     * @return a CompletableFuture containing the added external project
+     */
     @Async
     @Override
     public CompletableFuture<ExternalProject> addProjectToUser(Long userId, NewExternalProject newProject) {
@@ -89,6 +124,12 @@ public class UserServiceImpl implements UserService {
         });
     }
 
+    /**
+     * Retrieves all external projects associated with a user.
+     *
+     * @param userId the ID of the user to retrieve projects for
+     * @return a CompletableFuture containing a list of external projects associated with the user
+     */
     @Async
     @Override
     public CompletableFuture<List<ExternalProject>> getProjectsByUserId(Long userId) {

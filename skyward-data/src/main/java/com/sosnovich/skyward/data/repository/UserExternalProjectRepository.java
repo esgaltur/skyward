@@ -21,7 +21,20 @@ public interface UserExternalProjectRepository extends JpaRepository<UserExterna
      */
     List<UserExternalProjectEntity> findByUserId(Long userId);
 
+    /**
+     * Checks if a project with the specified ID is assigned to a user with the specified ID.
+     *
+     * @param id        the ID of the user
+     * @param projectId the ID of the project
+     * @return true if the project is assigned to the user, false otherwise
+     */
     boolean existsByUser_IdAndProjectId(Long id, String projectId);
 
+    /**
+     * Checks if a project with the specified ID exists.
+     *
+     * @param projectId the ID of the project
+     * @return true if the project exists, false otherwise
+     */
     boolean existsByProjectId(String projectId);
 }

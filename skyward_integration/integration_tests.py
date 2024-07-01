@@ -84,7 +84,10 @@ class TestUserProjectManagementAPI(unittest.TestCase):
         }
         response = requests.post(self.users_url, json=new_user_payload, headers=self.admin_headers)
         self.assertEqual(400, response.status_code)
-        self.assertEqual("Invalid input data", response.json()["error"])
+        #b'[{"field":"validateEmailNotInUse.email","message":"must be a well-formed email address","rejectedValue":"newuser22example.com"}]'
+        self.assertEqual("validateEmailNotInUse.email", response.json()[0]["field"])
+        self.assertEqual("must be a well-formed email address", response.json()[0]["message"])
+        self.assertEqual("newuser22example.com", response.json()[0]["rejectedValue"])
 
     def test_authenticate_user(self):
         self.authenticate_admin()
