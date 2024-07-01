@@ -75,7 +75,7 @@ Several enhancements are required to ensure secure operations:
 
 - **Environment Variables**: Store sensitive information such as passwords in environment variables
   instead of hardcoding them in the source code. This can be done using an `.env` file and
-  configuring your application to load these variables.
+  configuring the application to load these variables.
 
   Example `.env` file:
     ```dotenv
