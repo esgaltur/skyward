@@ -6,38 +6,38 @@ package "Application" {
 }
 
 package "Database" {
-  [skyward-database-1]
+  [skyward-database]
 }
 
 package "Logging" {
-  [skyward-filebeat-1]
-  [skyward-logstash-1]
-  [skyward-elasticsearch-1]
-  [skyward-kibana-1]
+  [skyward-filebeat]
+  [skyward-logstash]
+  [skyward-elasticsearch]
+  [skyward-kibana]
 }
 
 package "Metrics" {
-  [skyward-prometheus-1]
-  [skyward-grafana-1]
+  [skyward-prometheus]
+  [skyward-grafana]
 }
 
 package "Tracing" {
-  [skyward-jaeger-1]
+  [skyward-jaeger]
 }
 
 User --> [skyward-app] : Uses
-[skyward-app] --> [skyward-database-1] : Database Operations
+[skyward-app] --> [skyward-database] : Database Operations
 
-[skyward-app] --> [skyward-filebeat-1] : Sends Logs
-[skyward-filebeat-1] --> [skyward-logstash-1] : Forwards Logs
-[skyward-logstash-1] --> [skyward-elasticsearch-1] : Sends Processed Logs
-[skyward-kibana-1] --> [skyward-elasticsearch-1] : Queries Logs
-User --> [skyward-kibana-1] : Views Logs
+[skyward-app] --> [skyward-filebeat] : Sends Logs
+[skyward-filebeat] --> [skyward-logstash] : Forwards Logs
+[skyward-logstash] --> [skyward-elasticsearch] : Sends Processed Logs
+[skyward-kibana] --> [skyward-elasticsearch] : Queries Logs
+User --> [skyward-kibana] : Views Logs
 
-[skyward-app] --> [skyward-prometheus-1] : Sends Metrics
-[skyward-grafana-1] --> [skyward-prometheus-1] : Queries Metrics
-User --> [skyward-grafana-1] : Views Metrics
+[skyward-app] --> [skyward-prometheus] : Sends Metrics
+[skyward-grafana] --> [skyward-prometheus] : Queries Metrics
+User --> [skyward-grafana] : Views Metrics
 
-[skyward-app] --> [skyward-jaeger-1] : Sends Trace Data
-User --> [skyward-jaeger-1] : Views Traces
+[skyward-app] --> [skyward-jaeger] : Sends Trace Data
+User --> [skyward-jaeger] : Views Traces
 @enduml
