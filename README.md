@@ -54,7 +54,7 @@ parts include:
 - **skyward-openapi**: Manages API definitions and documentation.
 - **skyward-server**: Core server functionalities.
 - **skyward-tracing**: Implements tracing mechanisms.
-- **skyward_integration**: Integrates various components and services.
+- **skyward_integration**: Integration tests written in Python
 
 ## Security Improvements
 
