@@ -1,5 +1,3 @@
-Sure, here's the updated `README.md` content in markdown format:
-
 ```markdown
 # Skyward Project
 
