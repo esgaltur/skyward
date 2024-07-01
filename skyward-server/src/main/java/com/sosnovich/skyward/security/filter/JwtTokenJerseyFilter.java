@@ -50,10 +50,18 @@ public class JwtTokenJerseyFilter implements jakarta.servlet.Filter {
      * @return the JWT token or null if the token is not found
      */
     private String resolveToken(HttpServletRequest request) {
+        // The length of the "Bearer " prefix in the Authorization header
+        final int BEARER_PREFIX_LENGTH = 7;
+
         String bearerToken = request.getHeader("Authorization");
+
+        // Check if the Authorization header contains a Bearer token
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+            // Extract and return the JWT token by removing the "Bearer " prefix
+            return bearerToken.substring(BEARER_PREFIX_LENGTH);
         }
+
+        // Return null if the token is not found or does not start with "Bearer "
         return null;
     }
 
