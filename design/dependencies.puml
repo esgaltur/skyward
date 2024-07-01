@@ -139,6 +139,7 @@ package "Dependencies" {
 [skyward-parent] --> [commons-compress]
 [skyward-parent] --> [spring-ai-bom]
 [skyward-parent] --> [spring-boot-dependencies]
+[skyward-parent] --> [zipkin-reporter-brave]
 [skyward-parent] --> [micrometer-tracing-bridge-brave]
 [skyward-parent] --> [micrometer-registry-prometheus]
 [skyward-parent] --> [mapstruct]
@@ -153,8 +154,8 @@ package "Dependencies" {
 [skyward-parent] --> [grpc-netty-shaded]
 [skyward-parent] --> [opentelemetry-semconv]
 
-   [skyward-data] --> [spring-boot-starter]
-   [skyward-data] --> [spring-boot-starter-data-jpa]
+[skyward-data] --> [spring-boot-starter]
+[skyward-data] --> [spring-boot-starter-data-jpa]
 
 [skyward-tracing] --> [spring-boot-starter]
 [skyward-tracing] --> [opentelemetry-api]
@@ -183,6 +184,7 @@ package "Dependencies" {
 [skyward-server] --> [mapstruct]
 [skyward-server] --> [mapstruct-processor]
 [skyward-server] --> [rest-assured]
+
 [skyward-openapi] --> [jakarta.jakartaee-api]
 [skyward-openapi] --> [swagger-core]
 [skyward-openapi] --> [jackson-core]

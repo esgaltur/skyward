@@ -6,7 +6,7 @@
 !define FILTER(filterName) class filterName << (F,#FFD700) Filter >>
 !define CONTROLLER(controllerName) class controllerName << (C,#FFDD44) Controller >>
 
-package com.sosnovich.skyward.data.model {
+package com.skyward.data.model {
     ENTITY(UserEntity) {
         +Long id
         +String email
@@ -28,7 +28,7 @@ package com.sosnovich.skyward.data.model {
     }
 }
 
-package com.sosnovich.skyward.data.repository {
+package com.skyward.data.repository {
     REPOSITORY(UserRepository) {
         +findByEmail(String email) : Optional<UserEntity>
     }
@@ -38,7 +38,7 @@ package com.sosnovich.skyward.data.repository {
     }
 }
 
-package com.sosnovich.skyward.security {
+package com.skyward.security {
     SERVICE(UserDetailsServiceImpl) {
         -UserRepository userRepository
         +loadUserByUsername(String email) : UserDetails
@@ -54,7 +54,7 @@ package com.sosnovich.skyward.security {
     class JwtTokenFilter
 }
 
-package com.sosnovich.skyward.service {
+package com.skyward.service {
     SERVICE(UserService) {
         +createUser(NewUser newUser) : CompletableFuture<User>
         +getUserById(Long id) : CompletableFuture<Optional<User>>
@@ -64,7 +64,7 @@ package com.sosnovich.skyward.service {
     }
 }
 
-package com.sosnovich.skyward.tracing {
+package com.skyward.tracing {
     CONFIG(OpenTelemetryConfig) {
         +OpenTelemetry openTelemetry() : OpenTelemetry
         +Tracer tracer(OpenTelemetry openTelemetry) : Tracer
@@ -77,7 +77,7 @@ package com.sosnovich.skyward.tracing {
     }
 }
 
-package com.sosnovich.skyward.api {
+package com.skyward.api {
     CONTROLLER(UserController) {
         +createUser(NewUser newUser) : CompletableFuture<Response>
         +getUserById(Long id) : CompletableFuture<Response>
