@@ -99,7 +99,7 @@ class TestUserProjectManagementAPI(unittest.TestCase):
         }
         response = requests.post(self.auth_url, json=payload)
         self.assertEqual(401, response.status_code)
-        self.assertEqual("Unauthorized", response.json()["error"])
+        self.assertEqual("Bad credentials", response.json()["error"])
 
     def test_get_user_by_id(self):
         # Create a new user first
