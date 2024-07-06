@@ -2,7 +2,7 @@ package com.sosnovich.skyward.security;
 
 import com.sosnovich.skyward.security.api.JwtTokenProvider;
 import com.sosnovich.skyward.security.filter.JwtTokenJerseyFilter;
-import com.sosnovich.skyward.security.filter.SkywardCsrfFilter;
+import com.sosnovich.skyward.security.filter.CsrfSecurityFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +20,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
@@ -70,19 +69,23 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-
-        http.securityContext(httpSecuritySecurityContextConfigurer -> httpSecuritySecurityContextConfigurer.requireExplicitSave(false))
-                .csrf(csrf -> csrf.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
-                .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+        http.securityContext(sc -> sc.requireExplicitSave(true))
+                .csrf(csrf ->
+                        csrf.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                                .ignoringRequestMatchers("/api/auth/**")
+                )
+                .sessionManagement(sessionManagement ->
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 )
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(request -> {
                     CorsConfiguration corsConfiguration = new CorsConfiguration();
                     corsConfiguration.setAllowCredentials(true);
                     corsConfiguration.setAllowedOrigins(List.of("*"));
                     corsConfiguration.setAllowedHeaders(List.of("*"));
-                    corsConfiguration.setAllowedMethods(List.of(HttpMethod.GET.name(), HttpMethod.POST.name(), HttpMethod.OPTIONS.name()));
+                    corsConfiguration.setAllowedMethods(List.of(HttpMethod.GET.name(), HttpMethod.POST.name(),
+                            HttpMethod.DELETE.name(),
+                            HttpMethod.OPTIONS.name()));
                     corsConfiguration.setMaxAge(36000L);
                     return corsConfiguration;
 
@@ -93,7 +96,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/users/**").authenticated()
                                 .anyRequest().authenticated()
                 )
-                .addFilterBefore(new SkywardCsrfFilter(), BasicAuthenticationFilter.class)
+                .addFilterAfter(new CsrfSecurityFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtTokenJerseyFilter(jwtTokenProvider, userDetailsService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

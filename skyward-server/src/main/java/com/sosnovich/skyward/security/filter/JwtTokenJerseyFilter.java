@@ -16,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 
@@ -25,7 +24,6 @@ import java.io.IOException;
  */
 @Provider
 @Priority(Priorities.AUTHENTICATION)
-@Component
 public class JwtTokenJerseyFilter implements jakarta.servlet.Filter {
 
     private final JwtTokenProvider jwtTokenProvider;

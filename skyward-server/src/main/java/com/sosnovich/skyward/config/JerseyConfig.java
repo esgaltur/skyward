@@ -4,7 +4,6 @@ import com.sosnovich.skyward.controller.AuthController;
 import com.sosnovich.skyward.controller.UserController;
 import com.sosnovich.skyward.exceptionmappers.*;
 import com.sosnovich.skyward.tracing.filters.TraceFilter;
-import jakarta.annotation.PostConstruct;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
@@ -22,8 +21,7 @@ public class JerseyConfig extends ResourceConfig {
      * Constructor to configure Jersey with specific settings and register
      * various components like controllers, filters, and exception mappers.
      */
-    @PostConstruct
-    public void init() {
+    public JerseyConfig(){
         // Register controllers
         register(AuthController.class);
         register(UserController.class);
@@ -58,6 +56,8 @@ public class JerseyConfig extends ResourceConfig {
         register(UserNotFoundExceptionMapper.class);
         register(ProjectAlreadyExistsExceptionMapper.class);
         register(PathParamExceptionMapper.class);
+        register(MissingCsrfTokenExceptionExceptionMapper.class);
+        register(AccessDeniedExceptionExceptionMapper.class);
         register(ExceptionExceptionMapper.class);
     }
 }
