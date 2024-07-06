@@ -4,6 +4,7 @@ import com.sosnovich.skyward.controller.AuthController;
 import com.sosnovich.skyward.controller.UserController;
 import com.sosnovich.skyward.exceptionmappers.*;
 import com.sosnovich.skyward.tracing.filters.TraceFilter;
+import jakarta.annotation.PostConstruct;
 import org.glassfish.jersey.jackson.JacksonFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
@@ -17,12 +18,12 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class JerseyConfig extends ResourceConfig {
-
     /**
      * Constructor to configure Jersey with specific settings and register
      * various components like controllers, filters, and exception mappers.
      */
-    public JerseyConfig() {
+    @PostConstruct
+    public void init() {
         // Register controllers
         register(AuthController.class);
         register(UserController.class);
