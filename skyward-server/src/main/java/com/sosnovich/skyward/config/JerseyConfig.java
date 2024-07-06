@@ -17,12 +17,11 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class JerseyConfig extends ResourceConfig {
-
     /**
      * Constructor to configure Jersey with specific settings and register
      * various components like controllers, filters, and exception mappers.
      */
-    public JerseyConfig() {
+    public JerseyConfig(){
         // Register controllers
         register(AuthController.class);
         register(UserController.class);
@@ -57,6 +56,8 @@ public class JerseyConfig extends ResourceConfig {
         register(UserNotFoundExceptionMapper.class);
         register(ProjectAlreadyExistsExceptionMapper.class);
         register(PathParamExceptionMapper.class);
+        register(MissingCsrfTokenExceptionExceptionMapper.class);
+        register(AccessDeniedExceptionExceptionMapper.class);
         register(ExceptionExceptionMapper.class);
     }
 }
