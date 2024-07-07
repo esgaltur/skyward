@@ -55,11 +55,12 @@ package com.skyward.security {
 }
 
 package com.skyward.service {
-    SERVICE(UserService) {
-        +createUser(NewUser newUser) : CompletableFuture<User>
+    SERVICE(UserProjectService) {
+        +createUser(NewUserDTO newUser) : CompletableFuture<User>
         +getUserById(Long id) : CompletableFuture<Optional<User>>
         +deleteUser(Long id)
-        +addProjectToUser(Long userId, NewExternalProject newProject) : CompletableFuture<ExternalProject>
+        +updateUser(Long id, UpdateUserDTO updatedUser) : CompletableFuture<Boolean>
+        +assignProjectToUser(Long userId, NewExternalProjectDTO newProject) : CompletableFuture<ExternalProject>
         +getProjectsByUserId(Long userId) : CompletableFuture<List<ExternalProject>>
     }
 }
@@ -79,11 +80,12 @@ package com.skyward.tracing {
 
 package com.skyward.api {
     CONTROLLER(UserController) {
-        +createUser(NewUser newUser) : CompletableFuture<Response>
-        +getUserById(Long id) : CompletableFuture<Response>
+        +createUser(NewUser newUser) : Response
+        +getUserById(Long id) : Response
         +deleteUser(Long id) : Response
-        +addProjectToUser(Long userId, NewExternalProject newProject) : CompletableFuture<Response>
-        +getProjectsByUserId(Long userId) : CompletableFuture<Response>
+        +updateUser(Long id, UpdateUser updatedUser) : Response
+        +addExternalProject(Long userId, NewExternalProject newProject) : Response
+        +getExternalProjects(Long userId) : Response
     }
 }
 
@@ -94,13 +96,13 @@ SecurityConfig --> UserDetailsServiceImpl
 SecurityConfig --> JwtTokenProvider
 SecurityConfig --> JwtTokenFilter
 
-UserService --> UserRepository
-UserService --> UserExternalProjectRepository
+UserProjectService --> UserRepository
+UserProjectService --> UserExternalProjectRepository
 
 TraceFilter --> OpenTelemetryConfig
 TraceFilter --> Tracer
 
-UserController --> UserService
+UserController --> UserProjectService
 UserController --> UserDetailsServiceImpl
 
 @enduml
