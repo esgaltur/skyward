@@ -45,7 +45,7 @@ public interface UserProjectService {
      * @param newProject the new external project to add
      * @return a CompletableFuture containing the added external project
      */
-    CompletableFuture<ExternalProject> addProjectToUser(Long userId,@Valid NewExternalProjectDTO newProject);
+    CompletableFuture<ExternalProject> assignProjectToUser(Long userId, @Valid NewExternalProjectDTO newProject);
 
     /**
      * Retrieves all external projects associated with a user.

@@ -30,11 +30,5 @@ public interface UserExternalProjectRepository extends JpaRepository<UserExterna
      */
     boolean existsByUser_IdAndProjectId(Long id, String projectId);
 
-    /**
-     * Checks if a project with the specified ID exists.
-     *
-     * @param projectId the ID of the project
-     * @return true if the project exists, false otherwise
-     */
-    boolean existsByProjectId(String projectId);
+
 }

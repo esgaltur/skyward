@@ -1,16 +1,16 @@
 package com.sosnovich.skyward.data.model;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.id.IdentityGenerator;
-
-import java.util.Objects;
 
 /**
  * Entity class representing an external project associated with a user in the application.
  */
 @Entity
 @Table(name = "tb_user_external_project")
+@EqualsAndHashCode
 public class UserExternalProjectEntity {
 
     /**
@@ -44,7 +44,10 @@ public class UserExternalProjectEntity {
     @Column(name = "name", nullable = false, length = 120)
     private String name;
 
-    // Getters and setters
+
+    @Version
+    private int version;
+
 
     /**
      * Gets the project identifier.
@@ -118,19 +121,11 @@ public class UserExternalProjectEntity {
         this.id = id;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserExternalProjectEntity that = (UserExternalProjectEntity) o;
-        return Objects.equals(id, that.id) &&
-                Objects.equals(projectId, that.projectId) &&
-                Objects.equals(user, that.user) &&
-                Objects.equals(name, that.name);
+    public int getVersion() {
+        return version;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, projectId, user, name);
+    public void setVersion(int version) {
+        this.version = version;
     }
 }

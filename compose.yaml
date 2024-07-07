@@ -132,11 +132,15 @@ services:
     depends_on:
       database:
         condition: service_healthy # Start after database is healthy
-
+    volumes:
+      - ./keystore.jks:/app/keystore/keystore.jks # Mount Prometheus configuration
     environment:
       - LOGSTASH_HOST=logstash
+      - KEYSTORE_PATH=/app/keystore/keystore.jks
+      - KEYSTORE_PASSWORD=password # TODO: next step hashicorp vault
+      - server.ssl.enabled=true
        # Set server port
-      - server.port=8080
+      - server.port=8443
        # Set Spring application name
       - spring.application.name=skyward
       # Set Jersey type to filter
@@ -145,11 +149,11 @@ services:
       - spring.jersey.application-path=/api
       - spring.datasource.url=jdbc:mysql://database:3306/skyward
       - spring.datasource.username=skydmin
-      - spring.datasource.password=toor
+      - spring.datasource.password=toor #TODO: next step hashicorp vault
        # Set MySQL driver class name
       - spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
        # Set JWT secret key
-      - security.jwt.token.secret-key=hH0FDYs6EOmA7kV1M46vp4Bb29PvQrfVhuCxEgYfPpo=
+      - security.jwt.token.secret-key=hH0FDYs6EOmA7kV1M46vp4Bb29PvQrfVhuCxEgYfPpo= #TODO: next step hashicorp vault
 
        # Set JWT token expiration length
       - security.jwt.token.expire-length=3600000
@@ -166,12 +170,18 @@ services:
       - otel.java.global-autoconfigure.enabled=true
       - spring.profiles.docker=spring.profiles.active=docker
       - logging.config=classpath:logback-docker-spring.xml
+      - resilience4j.retry.instances.deleteUser.max-attempts=3
+      - resilience4j.retry.instances.deleteUser.wait-duration=500ms
+      - resilience4j.retry.instances.assignProjectToUser.max-attempts=3
+      - resilience4j.retry.instances.assignProjectToUser.wait-duration=500ms
+      - resilience4j.retry.instances.updateUser.max-attempts=3
+      - resilience4j.retry.instances.updateUser.wait-duration=500ms
     ports:
-      - "8080:8080" # Expose application port
+      - "8443:8443" # Expose application port
     networks:
       - internal_network # Connect to the internal network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://skyward-app:8080/health"]
+      test: ["CMD", "curl", "-f", "http://skyward-app:8443/health"]
       interval: 10s
       timeout: 5s
       retries: 5
