@@ -13,7 +13,7 @@ import org.mockito.MockitoAnnotations;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class UserValidationServiceImplTest {
+ class UserValidationServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
@@ -22,12 +22,12 @@ public class UserValidationServiceImplTest {
     private UserValidationServiceImpl userValidationService;
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-    public void testValidateUserExists_UserExists() {
+     void testValidateUserExists_UserExists() {
         Long userId = 1L;
 
         when(userRepository.existsById(userId)).thenReturn(true);
@@ -36,7 +36,7 @@ public class UserValidationServiceImplTest {
     }
 
     @Test
-    public void testValidateUserExists_UserDoesNotExist() {
+     void testValidateUserExists_UserDoesNotExist() {
         Long userId = 1L;
 
         when(userRepository.existsById(userId)).thenReturn(false);
@@ -49,7 +49,7 @@ public class UserValidationServiceImplTest {
     }
 
     @Test
-    public void testValidateEmailNotInUse_EmailNotInUse() {
+     void testValidateEmailNotInUse_EmailNotInUse() {
         String email = "test@example.com";
 
         when(userRepository.existsByEmail(email)).thenReturn(false);
@@ -58,7 +58,7 @@ public class UserValidationServiceImplTest {
     }
 
     @Test
-    public void testValidateEmailNotInUse_EmailInUse() {
+     void testValidateEmailNotInUse_EmailInUse() {
         String email = "test@example.com";
 
         when(userRepository.existsByEmail(email)).thenReturn(true);

@@ -1,7 +1,12 @@
 package com.sosnovich.skyward.controller;
 
+import com.sosnovich.skyward.dto.NewExternalProjectDTO;
+import com.sosnovich.skyward.dto.NewUserDTO;
+import com.sosnovich.skyward.dto.UpdateUserDTO;
 import com.sosnovich.skyward.exc.EmailAlreadyInUseException;
 import com.sosnovich.skyward.exc.MultithreadingException;
+import com.sosnovich.skyward.mapping.ProjectMapper;
+import com.sosnovich.skyward.mapping.UserMapper;
 import com.sosnovich.skyward.openapi.api.UsersApi;
 import com.sosnovich.skyward.openapi.model.*;
 import com.sosnovich.skyward.service.api.UserProjectService;
@@ -24,6 +29,8 @@ import java.util.concurrent.ExecutionException;
 public class UserController implements UsersApi {
 
     private final UserProjectService userProjectService;
+    private final UserMapper userMapper;
+    private final ProjectMapper projectMapper;
 
     /**
      * Constructs a UserController with the specified UserService.
@@ -31,9 +38,11 @@ public class UserController implements UsersApi {
      * @param userProjectService the service for managing users and their projects
      */
     @Autowired
-    public UserController(com.sosnovich.skyward.service.api.UserProjectService userProjectService) {
+    public UserController(UserProjectService userProjectService, UserMapper userMapper, ProjectMapper projectMapper) {
 
         this.userProjectService = userProjectService;
+        this.userMapper = userMapper;
+        this.projectMapper = projectMapper;
     }
 
     /**
@@ -47,7 +56,9 @@ public class UserController implements UsersApi {
     @Override
     public Response addExternalProject(Long id, NewExternalProject newExternalProject) {
         try {
-            CompletableFuture<ExternalProject> createdProject = userProjectService.addProjectToUser(id, newExternalProject);
+
+            NewExternalProjectDTO newProjectDTO = projectMapper.toNewExternalProjectDTO(newExternalProject);
+            CompletableFuture<ExternalProject> createdProject = userProjectService.addProjectToUser(id, newProjectDTO);
             var completedProject = createdProject.get();
             return Response.status(Response.Status.CREATED).entity(completedProject).build();
         } catch (ExecutionException | InterruptedException e) {
@@ -69,7 +80,8 @@ public class UserController implements UsersApi {
     @Override
     public Response createUser(NewUser newUser) {
         try {
-            CompletableFuture<User> createdUser = userProjectService.createUser(newUser);
+            NewUserDTO newUserDTO  = userMapper.toNewUserDTO(newUser);
+            CompletableFuture<User> createdUser = userProjectService.createUser(newUserDTO);
             var completedUser = createdUser.get();
             return Response.status(Response.Status.CREATED).entity(completedUser).build();
         } catch (InterruptedException e) {
@@ -155,6 +167,24 @@ public class UserController implements UsersApi {
             // Handle exceptions and re-interrupt the current thread
             Thread.currentThread().interrupt();
             throw new MultithreadingException("Exception occurred while retrieving user by ID", e);
+        }
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public Response updateUser(Long id, UpdateUser updateUser) {
+        try {
+            UpdateUserDTO updateUserDTO =userMapper.toDTO(updateUser);
+            CompletableFuture<Boolean> isUserUpdated = userProjectService.updateUser(id, updateUserDTO);
+            var completedIsUserUpdated = isUserUpdated.get();
+            return Boolean.TRUE.equals(completedIsUserUpdated) ? Response.status(Response.Status.OK).build() :
+                    Response.status(Response.Status.NOT_FOUND)
+                            .entity(new GetUserById404Response("User not found with ID: " + id))
+                            .build();
+        } catch (ExecutionException | InterruptedException e) {
+            // Handle exceptions and re-interrupt the current thread
+            Thread.currentThread().interrupt();
+            throw new MultithreadingException("Exception occurred while updating the user by ID", e);
         }
     }
 }

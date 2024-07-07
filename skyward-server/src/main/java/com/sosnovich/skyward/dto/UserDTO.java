@@ -1,10 +1,8 @@
 package com.sosnovich.skyward.dto;
 
-import jakarta.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.validation.annotation.Validated;
 
 /**
  * Data Transfer Object for User information.
@@ -12,7 +10,6 @@ import org.springframework.validation.annotation.Validated;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Validated
 public class UserDTO {
 
     /**
@@ -23,7 +20,6 @@ public class UserDTO {
     /**
      * The email address of the user.
      */
-    @Email
     private String email;
 
     /**

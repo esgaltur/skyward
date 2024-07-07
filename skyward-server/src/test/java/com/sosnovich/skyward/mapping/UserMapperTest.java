@@ -12,17 +12,17 @@ import org.mapstruct.factory.Mappers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class UserMapperTest {
+ class UserMapperTest {
 
     private UserMapper userMapper;
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         userMapper = Mappers.getMapper(UserMapper.class);
     }
 
     @Test
-    public void testToNewUserDTO() {
+     void testToNewUserDTO() {
         NewUser newUser = new NewUser();
         newUser.setEmail("newuser@example.com");
         newUser.setPassword("newpassword");
@@ -37,7 +37,7 @@ public class UserMapperTest {
     }
 
     @Test
-    public void testToEntityFromNewUserDTO() {
+     void testToEntityFromNewUserDTO() {
         NewUserDTO newUserDTO = new NewUserDTO();
         newUserDTO.setEmail("newuser@example.com");
         newUserDTO.setPassword("newpassword");
@@ -52,7 +52,7 @@ public class UserMapperTest {
     }
 
     @Test
-    public void testToEntityFromUserDTO() {
+     void testToEntityFromUserDTO() {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(1L);
         userDTO.setEmail("user@example.com");
@@ -67,7 +67,7 @@ public class UserMapperTest {
     }
 
     @Test
-    public void testToDTO() {
+     void testToDTO() {
         UserEntity userEntity = new UserEntity();
         userEntity.setId(1L);
         userEntity.setEmail("user@example.com");
@@ -82,7 +82,7 @@ public class UserMapperTest {
     }
 
     @Test
-    public void testToApiModel() {
+     void testToApiModel() {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(1L);
         userDTO.setEmail("user@example.com");

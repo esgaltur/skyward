@@ -1,7 +1,6 @@
 package com.sosnovich.skyward.config;
 
 import com.sosnovich.skyward.data.config.JpaConfig;
-import com.sosnovich.skyward.security.JwtTokenFilterConfig;
 import com.sosnovich.skyward.security.SecurityConfig;
 import com.sosnovich.skyward.tracing.OpenTelemetryConfig;
 import io.undertow.UndertowOptions;
@@ -21,14 +20,11 @@ import static io.undertow.servlet.Servlets.servlet;
  * aspects for the application.
  */
 @Configuration
-@Import({OpenTelemetryConfig.class, SecurityConfig.class, JpaConfig.class, JwtTokenFilterConfig.class})
+@Import({OpenTelemetryConfig.class, SecurityConfig.class, JpaConfig.class})
 @EnableAutoConfiguration
 @ComponentScan(basePackageClasses = SkywardServerConfiguration.class)
 @EnableAsync
 public class SkywardServerConfiguration {
-
-
-
     /**
      * Configures the Undertow Servlet Web Server Factory.
      *

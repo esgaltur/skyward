@@ -1,9 +1,10 @@
 package com.sosnovich.skyward.service.api;
 
-import com.sosnovich.skyward.openapi.model.ExternalProject;
-import com.sosnovich.skyward.openapi.model.NewExternalProject;
-import com.sosnovich.skyward.openapi.model.NewUser;
-import com.sosnovich.skyward.openapi.model.User;
+import com.sosnovich.skyward.dto.NewExternalProjectDTO;
+import com.sosnovich.skyward.dto.NewUserDTO;
+import com.sosnovich.skyward.dto.UpdateUserDTO;
+import com.sosnovich.skyward.openapi.model.*;
+import jakarta.validation.Valid;
 
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +21,7 @@ public interface UserProjectService {
      * @param newUser the new user to be created
      * @return a CompletableFuture containing the created user
      */
-    CompletableFuture<User> createUser(NewUser newUser);
+    CompletableFuture<User> createUser(@Valid NewUserDTO newUser);
 
     /**
      * Retrieves a user by their ID.
@@ -44,7 +45,7 @@ public interface UserProjectService {
      * @param newProject the new external project to add
      * @return a CompletableFuture containing the added external project
      */
-    CompletableFuture<ExternalProject> addProjectToUser(Long userId, NewExternalProject newProject);
+    CompletableFuture<ExternalProject> addProjectToUser(Long userId,@Valid NewExternalProjectDTO newProject);
 
     /**
      * Retrieves all external projects associated with a user.
@@ -53,4 +54,14 @@ public interface UserProjectService {
      * @return a CompletableFuture containing a list of external projects associated with the user
      */
     CompletableFuture<List<ExternalProject>> getProjectsByUserId(Long userId);
+
+
+    /**
+     * Updates an existing user.
+     *
+     * @param userId the ID of the user to update
+     * @param updatedUser the updated user information
+     * @return a CompletableFuture containing the updated user
+     */
+    CompletableFuture<Boolean> updateUser(Long userId, @Valid UpdateUserDTO updatedUser);
 }

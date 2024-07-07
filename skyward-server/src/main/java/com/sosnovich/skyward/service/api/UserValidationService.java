@@ -2,8 +2,6 @@ package com.sosnovich.skyward.service.api;
 
 import com.sosnovich.skyward.exc.EmailAlreadyInUseException;
 import com.sosnovich.skyward.exc.UserNotFoundException;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 
 /**
  * Interface for validating user-related operations.
@@ -24,5 +22,5 @@ public interface UserValidationService {
      * @param email the email to check
      * @throws EmailAlreadyInUseException if the email is already in use
      */
-    void validateEmailNotInUse(@Valid @Email String email);
+    void validateEmailNotInUse(String email);
 }
