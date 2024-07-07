@@ -3,4 +3,4 @@ scrape_configs:  # Define the list of scrape configurations for Prometheus
     scrape_interval: 1s  # How often Prometheus should scrape the metrics endpoint (every 1 second)
     metrics_path: '/actuator/prometheus'  # Path to the metrics endpoint that Prometheus will scrape
     static_configs:  # Define static targets for this scrape job
-      - targets: ['skyward-app:8080']  # List of targets (endpoints) to scrape metrics from, in this case, the skyward-app on port 8080
+      - targets: ['skyward-app:8443']  # List of targets (endpoints) to scrape metrics from, in this case, the skyward-app on port 8080

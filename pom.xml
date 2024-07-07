@@ -19,8 +19,10 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <skyward-data.version>0.0.1-SNAPSHOT</skyward-data.version>
+        <skyward-tracing.version>0.0.1-SNAPSHOT</skyward-tracing.version>
+        <skyward-openapi.version>0.0.1-SNAPSHOT</skyward-openapi.version>
         <jakarta.jakartaee-api.version>10.0.0</jakarta.jakartaee-api.version>
-        <java.version>${maven-compiler-plugin.source}</java.version>
         <mysql-connector-j.version>8.2.0</mysql-connector-j.version>
         <liquibase-maven-plugin.version>4.25.0</liquibase-maven-plugin.version>
         <maven-compiler-plugin.source>17</maven-compiler-plugin.source>
@@ -30,8 +32,6 @@
         <commons-compress.version>1.26.1</commons-compress.version>
         <spring-boot-dependencies.version>3.3.1</spring-boot-dependencies.version>
         <micrometer-registry-prometheus.version>1.13.1</micrometer-registry-prometheus.version>
-        <testcontainers-junit-jupiter.version>1.19.8</testcontainers-junit-jupiter.version>
-        <liquibase-core.version>4.27.0</liquibase-core.version>
         <opentelemetry-sdk-extension-autoconfigure.version>1.6.0</opentelemetry-sdk-extension-autoconfigure.version>
         <logback-classic.version>1.5.6</logback-classic.version>
         <logstash-logback-encoder.version>7.4</logstash-logback-encoder.version>
@@ -40,14 +40,11 @@
         <opentelemetry-sdk.version>1.9.1</opentelemetry-sdk.version>
         <guava.version>32.1.3-android</guava.version>
         <protobuf-java.version>3.25.2</protobuf-java.version>
-        <skyward-data.version>0.0.1-SNAPSHOT</skyward-data.version>
-        <skyward-tracing.version>0.0.1-SNAPSHOT</skyward-tracing.version>
-        <skyward-openapi.version>0.0.1-SNAPSHOT</skyward-openapi.version>
         <bcprov-jdk18on.version>${bcutil-jdk15on.version}</bcprov-jdk18on.version>
         <jjwt.version>0.12.3</jjwt.version>
         <spring-security-jwt.version>1.1.1.RELEASE</spring-security-jwt.version>
-        <bcutil-jdk15on.version>1.70</bcutil-jdk15on.version>
-        <bcprov-jdk15on.version>1.70</bcprov-jdk15on.version>
+        <bcutil-jdk15on.version>[1.70,)</bcutil-jdk15on.version>
+        <bcprov-jdk15on.version>[1.70,)</bcprov-jdk15on.version>
         <micrometer-tracing-bridge-brave.version>1.3.1</micrometer-tracing-bridge-brave.version>
         <zipkin-reporter-brave.version>3.4.0</zipkin-reporter-brave.version>
         <xnio-api.version>3.8.16.Final</xnio-api.version>
@@ -119,30 +116,14 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-testcontainers</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
+          <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>mysql</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -251,18 +232,6 @@
                 <artifactId>lombok</artifactId>
                 <optional>true</optional>
                 <version>${lombok.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <scope>test</scope>
-                <version>${testcontainers-junit-jupiter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>mysql</artifactId>
-                <scope>test</scope>
-                <version>${testcontainers-junit-jupiter.version}</version>
             </dependency>
             <dependency>
                 <groupId>jakarta.platform</groupId>

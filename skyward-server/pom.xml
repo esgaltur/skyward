@@ -33,7 +33,6 @@
         <bcprov-jdk18on.version>${bcutil-jdk15on.version}</bcprov-jdk18on.version>
         <jjwt.version>[0.12.3,)</jjwt.version>
         <spring-security-jwt.version>[1.1.1.RELEASE,)</spring-security-jwt.version>
-
         <resilience4j-spring-boot3.version>[2.2.0,)</resilience4j-spring-boot3.version>
     </properties>
     <dependencies>
