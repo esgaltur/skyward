@@ -36,3 +36,4 @@ build/
 
 *-local.properties
 *.jks
+/skyward_integration/keystore.p12
