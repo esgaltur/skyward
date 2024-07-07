@@ -1,7 +1,7 @@
-import uuid
-import jwt
-import requests
 import unittest
+import uuid
+
+import requests
 
 USER_EXAMPLE_COM = "user3@example.com"
 
@@ -12,10 +12,6 @@ cert_path = "www.dev.sosnovich.com_r3_.cer"
 private_key = "private_key.key"
 
 
-class CustomSession(requests.Session):
-    pass
-
-
 class TestUserProjectManagementAPI(unittest.TestCase):
 
     @classmethod
@@ -23,7 +19,7 @@ class TestUserProjectManagementAPI(unittest.TestCase):
         cls.base_url = BASE_URL
         cls.auth_url = f"{cls.base_url}/auth/login"
         cls.users_url = f"{cls.base_url}/users"
-        cls.session = CustomSession()
+        cls.session = requests.Session()
         cls.csrf_token = None
         cls.csrf_header_name = "X-XSRF-TOKEN"
 
@@ -221,7 +217,6 @@ class TestUserProjectManagementAPI(unittest.TestCase):
         self.assertEqual(404, response.status_code)
         self.assertEqual("User not found with ID: 999999", response.json()["error"])
 
-
     def test_update_user_success(self):
         new_user_email = self.generate_unique_email()
         self.test_user_id = self.create_user(new_user_email, "newpassword123", "New User")
@@ -230,10 +225,10 @@ class TestUserProjectManagementAPI(unittest.TestCase):
             "password": "updatedpassword123",
             "name": "Updated User"
         }
-        response = self.session.put(f"{self.users_url}/{self.test_user_id}", json=update_data, headers=self.admin_headers,
+        response = self.session.put(f"{self.users_url}/{self.test_user_id}", json=update_data,
+                                    headers=self.admin_headers,
                                     cert=(cert_path, private_key), verify=False)
         self.assertEqual(response.status_code, 200)
-
 
     def test_update_user_not_found(self):
         update_data = {
@@ -247,7 +242,6 @@ class TestUserProjectManagementAPI(unittest.TestCase):
         error_message = response.json()
         self.assertEqual(error_message["error"], "User not found with ID: 9999")
 
-
     def test_update_user_invalid_input(self):
         new_user_email = self.generate_unique_email()
         self.test_user_id = self.create_user(new_user_email, "newpassword123", "New User")
@@ -256,9 +250,10 @@ class TestUserProjectManagementAPI(unittest.TestCase):
             "password": "updatedpassword123",
             "name": "Invalid User"
         }
-        response = self.session.put(f"{self.users_url}/{self.test_user_id}", json=update_data, headers=self.admin_headers,
+        response = self.session.put(f"{self.users_url}/{self.test_user_id}", json=update_data,
+                                    headers=self.admin_headers,
                                     cert=(cert_path, private_key), verify=False)
-        self.assertEqual(400,response.status_code )
+        self.assertEqual(400, response.status_code)
         error_message = response.json()
         self.assertIn("must be a well-formed email address", error_message[0]["message"])
 
