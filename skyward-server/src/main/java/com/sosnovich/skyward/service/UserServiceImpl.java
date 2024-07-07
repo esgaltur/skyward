@@ -4,16 +4,10 @@ import com.sosnovich.skyward.data.model.UserEntity;
 import com.sosnovich.skyward.data.model.UserExternalProjectEntity;
 import com.sosnovich.skyward.data.repository.UserExternalProjectRepository;
 import com.sosnovich.skyward.data.repository.UserRepository;
-import com.sosnovich.skyward.dto.ExternalProjectDTO;
-import com.sosnovich.skyward.dto.NewExternalProjectDTO;
-import com.sosnovich.skyward.dto.NewUserDTO;
-import com.sosnovich.skyward.dto.UserDTO;
+import com.sosnovich.skyward.dto.*;
 import com.sosnovich.skyward.mapping.ProjectMapper;
 import com.sosnovich.skyward.mapping.UserMapper;
-import com.sosnovich.skyward.openapi.model.ExternalProject;
-import com.sosnovich.skyward.openapi.model.NewExternalProject;
-import com.sosnovich.skyward.openapi.model.NewUser;
-import com.sosnovich.skyward.openapi.model.User;
+import com.sosnovich.skyward.openapi.model.*;
 import com.sosnovich.skyward.service.api.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -40,11 +34,11 @@ public class UserServiceImpl implements UserService {
     /**
      * Constructs a new UserServiceImpl.
      *
-     * @param userRepository                 the repository for user entities
-     * @param userExternalProjectRepository  the repository for user external project entities
-     * @param userMapper                     the mapper for user entities and DTOs
-     * @param projectMapper                  the mapper for project entities and DTOs
-     * @param bCryptPasswordEncoder          the password encoder
+     * @param userRepository                the repository for user entities
+     * @param userExternalProjectRepository the repository for user external project entities
+     * @param userMapper                    the mapper for user entities and DTOs
+     * @param projectMapper                 the mapper for project entities and DTOs
+     * @param bCryptPasswordEncoder         the password encoder
      */
     @Autowired
     public UserServiceImpl(UserRepository userRepository, UserExternalProjectRepository userExternalProjectRepository, UserMapper userMapper, ProjectMapper projectMapper,
@@ -64,11 +58,10 @@ public class UserServiceImpl implements UserService {
      */
     @Async
     @Override
-    public CompletableFuture<User> createUser(NewUser newUser) {
+    public CompletableFuture<User> createUser(NewUserDTO newUser) {
         return CompletableFuture.supplyAsync(() -> {
-            NewUserDTO newUserDTO = userMapper.toNewUserDTO(newUser);
-            newUserDTO.setPassword(bCryptPasswordEncoder.encode(newUserDTO.getPassword()));
-            UserEntity userEntity = userMapper.toEntity(newUserDTO);
+            newUser.setPassword(bCryptPasswordEncoder.encode(newUser.getPassword()));
+            UserEntity userEntity = userMapper.toEntity(newUser);
             UserEntity savedUserEntity = userRepository.save(userEntity);
             UserDTO userDTO = userMapper.toDTO(savedUserEntity);
             return userMapper.toApiModel(userDTO);
@@ -111,12 +104,12 @@ public class UserServiceImpl implements UserService {
      */
     @Async
     @Override
-    public CompletableFuture<ExternalProject> addProjectToUser(Long userId, NewExternalProject newProject) {
+    public CompletableFuture<ExternalProject> addProjectToUser(Long userId, NewExternalProjectDTO newProject) {
         return CompletableFuture.supplyAsync(() -> {
-            NewExternalProjectDTO newProjectDTO = projectMapper.toNewExternalProjectDTO(newProject);
+
             UserEntity userEntity = userRepository.findById(userId)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
-            UserExternalProjectEntity projectEntity = projectMapper.toEntity(newProjectDTO);
+            UserExternalProjectEntity projectEntity = projectMapper.toEntity(newProject);
             projectEntity.setUser(userEntity);
             UserExternalProjectEntity savedProjectEntity = userExternalProjectRepository.save(projectEntity);
             ExternalProjectDTO externalProjectDTO = projectMapper.toDTO(savedProjectEntity);
@@ -137,5 +130,28 @@ public class UserServiceImpl implements UserService {
                 .map(projectMapper::toDTO)
                 .map(projectMapper::toApiModel)
                 .toList());
+    }
+
+    /**
+     * Updates an existing user.
+     *
+     * @param userId      the ID of the user to update
+     * @param updatedUser the updated user information
+     * @return a CompletableFuture containing the updated user
+     */
+    @Async
+    @Override
+    public CompletableFuture<Boolean> updateUser(Long userId, UpdateUserDTO updatedUser) {
+        return CompletableFuture.supplyAsync(() -> {
+            UserEntity userEntity = userRepository.findById(userId)
+                    .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
+
+            if (updatedUser.getPassword() != null) {
+                updatedUser.setPassword(bCryptPasswordEncoder.encode(updatedUser.getPassword()));
+            }
+            userMapper.updateUserFromDto(updatedUser, userEntity);
+            userRepository.save(userEntity);
+            return true;
+        });
     }
 }

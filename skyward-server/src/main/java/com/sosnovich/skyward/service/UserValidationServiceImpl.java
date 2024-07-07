@@ -5,8 +5,6 @@ import com.sosnovich.skyward.exc.EmailAlreadyInUseException;
 import com.sosnovich.skyward.exc.UserNotFoundException;
 import com.sosnovich.skyward.service.api.UserValidationService;
 import com.sosnovich.skyward.service.errors.ServiceError;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -50,7 +48,7 @@ public class UserValidationServiceImpl implements UserValidationService {
      * @throws EmailAlreadyInUseException if the email is already in use
      */
     @Override
-    public void validateEmailNotInUse(@Valid @Email String email) {
+    public void validateEmailNotInUse(String email) {
         if (userRepository.existsByEmail(email)) {
             throw new EmailAlreadyInUseException(ServiceError.EMAIL_ALREADY_IN_USE.format(email));
         }

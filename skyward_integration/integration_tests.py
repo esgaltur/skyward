@@ -3,6 +3,10 @@ import jwt
 import requests
 import unittest
 
+USER_EXAMPLE_COM = "user3@example.com"
+
+NEW_USER_ = "New User 2"
+
 BASE_URL = "https://127.0.0.1:8080/api"
 cert_path = "www.dev.sosnovich.com_r3_.cer"
 private_key = "private_key.key"
@@ -47,7 +51,7 @@ class TestUserProjectManagementAPI(unittest.TestCase):
 
     def instance_authenticate_admin(self):
         payload = {
-            "email": "user3@example.com",
+            "email": USER_EXAMPLE_COM,
             "password": "SQDJok-aUB8BfmaN"
         }
         response = self.session.post(self.auth_url, json=payload, cert=(cert_path, private_key), verify=False)
@@ -97,7 +101,7 @@ class TestUserProjectManagementAPI(unittest.TestCase):
         return f"testuser_{uuid.uuid4()}@example.com"
 
     def test_create_user_success(self):
-        self.test_user_id = self.create_user(self.generate_unique_email(), "newpassword123", "New User 2")
+        self.test_user_id = self.create_user(self.generate_unique_email(), "newpassword123", NEW_USER_)
         self.assertIsNotNone(self.test_user_id)
 
     def test_create_user_email_in_use(self):
@@ -120,7 +124,7 @@ class TestUserProjectManagementAPI(unittest.TestCase):
         response = self.session.post(self.users_url, json=new_user_payload, headers=self.admin_headers,
                                      cert=(cert_path, private_key), verify=False)
         self.assertEqual(400, response.status_code)
-        self.assertEqual("validateEmailNotInUse.email", response.json()[0]["field"])
+        self.assertEqual("createUser.newUser.email", response.json()[0]["field"])
         self.assertEqual("must be a well-formed email address", response.json()[0]["message"])
         self.assertEqual("newuser22example.com", response.json()[0]["rejectedValue"])
 
@@ -216,6 +220,47 @@ class TestUserProjectManagementAPI(unittest.TestCase):
                                     verify=False)
         self.assertEqual(404, response.status_code)
         self.assertEqual("User not found with ID: 999999", response.json()["error"])
+
+
+    def test_update_user_success(self):
+        new_user_email = self.generate_unique_email()
+        self.test_user_id = self.create_user(new_user_email, "newpassword123", "New User")
+        update_data = {
+            "email": "updateduser@example.com",
+            "password": "updatedpassword123",
+            "name": "Updated User"
+        }
+        response = self.session.put(f"{self.users_url}/{self.test_user_id}", json=update_data, headers=self.admin_headers,
+                                    cert=(cert_path, private_key), verify=False)
+        self.assertEqual(response.status_code, 200)
+
+
+    def test_update_user_not_found(self):
+        update_data = {
+            "email": "nonexistinguser@example.com",
+            "password": "nonexistingpassword123",
+            "name": "Non-existing User"
+        }
+        response = self.session.put(f"{self.users_url}/9999", json=update_data, headers=self.admin_headers,
+                                    cert=(cert_path, private_key), verify=False)
+        self.assertEqual(response.status_code, 404)
+        error_message = response.json()
+        self.assertEqual(error_message["error"], "User not found with ID: 9999")
+
+
+    def test_update_user_invalid_input(self):
+        new_user_email = self.generate_unique_email()
+        self.test_user_id = self.create_user(new_user_email, "newpassword123", "New User")
+        update_data = {
+            "email": "invalid-email",
+            "password": "updatedpassword123",
+            "name": "Invalid User"
+        }
+        response = self.session.put(f"{self.users_url}/{self.test_user_id}", json=update_data, headers=self.admin_headers,
+                                    cert=(cert_path, private_key), verify=False)
+        self.assertEqual(400,response.status_code )
+        error_message = response.json()
+        self.assertIn("must be a well-formed email address", error_message[0]["message"])
 
 
 if __name__ == '__main__':

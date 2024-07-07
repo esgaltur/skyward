@@ -12,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class ProjectMapperTest {
+ class ProjectMapperTest {
 
     private ProjectMapper projectMapper;
 
@@ -22,7 +22,7 @@ public class ProjectMapperTest {
     }
 
     @Test
-    public void testToNewExternalProjectDTO() {
+     void testToNewExternalProjectDTO() {
         NewExternalProject newExternalProject = new NewExternalProject();
         newExternalProject.setId("123");
         newExternalProject.setName("Project Name");
@@ -35,7 +35,7 @@ public class ProjectMapperTest {
     }
 
     @Test
-    public void testToEntity() {
+     void testToEntity() {
         NewExternalProjectDTO newExternalProjectDTO = new NewExternalProjectDTO();
         newExternalProjectDTO.setProjectId("123");
         newExternalProjectDTO.setName("Project Name");
@@ -48,7 +48,7 @@ public class ProjectMapperTest {
     }
 
     @Test
-    public void testToDTO() {
+     void testToDTO() {
         UserExternalProjectEntity entity = new UserExternalProjectEntity();
         entity.setProjectId("123");
         entity.setName("Project Name");
@@ -61,7 +61,7 @@ public class ProjectMapperTest {
     }
 
     @Test
-    public void testToApiModel() {
+     void testToApiModel() {
         ExternalProjectDTO externalProjectDTO = new ExternalProjectDTO();
         externalProjectDTO.setProjectId("123");
         externalProjectDTO.setName("Project Name");

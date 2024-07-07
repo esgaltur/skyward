@@ -10,6 +10,7 @@ import com.sosnovich.skyward.dto.NewUserDTO;
 import com.sosnovich.skyward.dto.UserDTO;
 import com.sosnovich.skyward.mapping.ProjectMapper;
 import com.sosnovich.skyward.mapping.UserMapper;
+import com.sosnovich.skyward.mapping.UserMapperImpl;
 import com.sosnovich.skyward.openapi.model.ExternalProject;
 import com.sosnovich.skyward.openapi.model.NewExternalProject;
 import com.sosnovich.skyward.openapi.model.NewUser;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -27,7 +29,7 @@ import java.util.concurrent.CompletableFuture;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
+@Import(UserMapperImpl.class)
  class UserServiceImplTest {
 
     @Mock
@@ -93,7 +95,7 @@ import static org.mockito.Mockito.*;
         when(userMapper.toDTO(savedUserEntity)).thenReturn(userDTO);
         when(userMapper.toApiModel(userDTO)).thenReturn(user);
 
-        CompletableFuture<User> result = userService.createUser(newUser);
+        CompletableFuture<User> result = userService.createUser(newUserDTO);
 
         assertEquals(user, result.join());
     }
@@ -115,7 +117,7 @@ import static org.mockito.Mockito.*;
         when(userMapper.toEntity(newUserDTO)).thenReturn(new UserEntity());
         when(userRepository.save(any(UserEntity.class))).thenThrow(RuntimeException.class);
 
-        CompletableFuture<User> result = userService.createUser(newUser);
+        CompletableFuture<User> result = userService.createUser(newUserDTO);
 
         assertThrows(RuntimeException.class, result::join);
     }
@@ -210,7 +212,7 @@ import static org.mockito.Mockito.*;
         when(projectMapper.toDTO(savedProjectEntity)).thenReturn(externalProjectDTO);
         when(projectMapper.toApiModel(externalProjectDTO)).thenReturn(externalProject);
 
-        CompletableFuture<ExternalProject> result = userService.addProjectToUser(userId, newProject);
+        CompletableFuture<ExternalProject> result = userService.addProjectToUser(userId, newProjectDTO);
 
         assertEquals(externalProject, result.join());
     }

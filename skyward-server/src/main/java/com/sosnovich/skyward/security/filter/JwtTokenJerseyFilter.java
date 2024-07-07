@@ -1,16 +1,12 @@
 package com.sosnovich.skyward.security.filter;
 
 import com.sosnovich.skyward.security.api.JwtTokenProvider;
-import jakarta.annotation.Priority;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.ws.rs.Priorities;
-import jakarta.ws.rs.ext.Provider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,8 +18,6 @@ import java.io.IOException;
 /**
  * Filter for JWT token authentication in Jersey-based applications.
  */
-@Provider
-@Priority(Priorities.AUTHENTICATION)
 public class JwtTokenJerseyFilter implements jakarta.servlet.Filter {
 
     private final JwtTokenProvider jwtTokenProvider;
@@ -35,7 +29,6 @@ public class JwtTokenJerseyFilter implements jakarta.servlet.Filter {
      * @param jwtTokenProvider the provider for JWT tokens
      * @param userDetailsService the service for loading user-specific data
      */
-    @Autowired
     public JwtTokenJerseyFilter(JwtTokenProvider jwtTokenProvider, UserDetailsService userDetailsService) {
         this.jwtTokenProvider = jwtTokenProvider;
         this.userDetailsService = userDetailsService;

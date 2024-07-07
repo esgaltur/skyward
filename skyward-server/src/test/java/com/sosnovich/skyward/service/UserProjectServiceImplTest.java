@@ -1,8 +1,8 @@
 package com.sosnovich.skyward.service;
 
+import com.sosnovich.skyward.dto.NewExternalProjectDTO;
+import com.sosnovich.skyward.dto.NewUserDTO;
 import com.sosnovich.skyward.openapi.model.ExternalProject;
-import com.sosnovich.skyward.openapi.model.NewExternalProject;
-import com.sosnovich.skyward.openapi.model.NewUser;
 import com.sosnovich.skyward.openapi.model.User;
 import com.sosnovich.skyward.service.api.ProjectValidationService;
 import com.sosnovich.skyward.service.api.UserService;
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.*;
 
     @Test
      void testCreateUser() {
-        NewUser newUser = new NewUser();
+        NewUserDTO newUser = new NewUserDTO();
         newUser.setEmail("test@example.com");
         newUser.setPassword("password");
         newUser.setName("Test User");
@@ -89,8 +89,8 @@ import static org.mockito.Mockito.*;
     @Test
      void testAddProjectToUser() {
         Long userId = 1L;
-        NewExternalProject newProject = new NewExternalProject();
-        newProject.setId("projectId");
+        NewExternalProjectDTO newProject = new NewExternalProjectDTO();
+        newProject.setProjectId("projectId");
         newProject.setName("Test Project");
 
         ExternalProject externalProject = new ExternalProject();

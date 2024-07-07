@@ -2,11 +2,12 @@ package com.sosnovich.skyward.mapping;
 
 import com.sosnovich.skyward.data.model.UserEntity;
 import com.sosnovich.skyward.dto.NewUserDTO;
+import com.sosnovich.skyward.dto.UpdateUserDTO;
 import com.sosnovich.skyward.dto.UserDTO;
 import com.sosnovich.skyward.openapi.model.NewUser;
+import com.sosnovich.skyward.openapi.model.UpdateUser;
 import com.sosnovich.skyward.openapi.model.User;
-import org.mapstruct.Builder;
-import org.mapstruct.Mapper;
+import org.mapstruct.*;
 
 /**
  * Mapper interface for converting between different representations of users.
@@ -20,7 +21,7 @@ public interface UserMapper {
      * @param newUser the new user
      * @return the corresponding NewUserDTO
      */
-  NewUserDTO toNewUserDTO(NewUser newUser);
+    NewUserDTO toNewUserDTO(NewUser newUser);
 
     /**
      * Converts a NewUserDTO to a UserEntity.
@@ -54,6 +55,18 @@ public interface UserMapper {
      * @return the corresponding User
      */
     User toApiModel(UserDTO userDTO);
+
+    UpdateUserDTO toDTO(UpdateUser updateUser);
+
+    @Mapping(target = "email", source = "updateUserDTO.email", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "password", source = "updateUserDTO.password", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "name", source = "updateUserDTO.name", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "role", source = "updateUserDTO.role", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "accountExpired", source = "updateUserDTO.accountExpired", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "accountLocked", source = "updateUserDTO.accountLocked", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "credentialsExpired", source = "updateUserDTO.credentialsExpired", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    @Mapping(target = "disabled", source = "updateUserDTO.disabled", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateUserFromDto(UpdateUserDTO updateUserDTO, @MappingTarget UserEntity userEntity);
 
 
 

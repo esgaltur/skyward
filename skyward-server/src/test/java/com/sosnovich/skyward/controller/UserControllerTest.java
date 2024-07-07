@@ -1,5 +1,9 @@
 package com.sosnovich.skyward.controller;
 
+import com.sosnovich.skyward.dto.NewExternalProjectDTO;
+import com.sosnovich.skyward.dto.NewUserDTO;
+import com.sosnovich.skyward.mapping.ProjectMapper;
+import com.sosnovich.skyward.mapping.UserMapper;
 import com.sosnovich.skyward.openapi.model.*;
 import com.sosnovich.skyward.service.api.UserProjectService;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import jakarta.ws.rs.core.Response;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -16,33 +21,40 @@ import java.util.concurrent.CompletableFuture;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
- class UserControllerTest {
+class UserControllerTest {
 
     @Mock
     private UserProjectService userProjectService;
-
+    @Mock
+    private UserMapper userMapper;
+    @Mock
+    private ProjectMapper projectMapper;
     @InjectMocks
     private UserController userController;
 
     @BeforeEach
-     void setUp() {
-        MockitoAnnotations.initMocks(this);
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
-     void testAddExternalProject_Success() {
+    void testAddExternalProject_Success() {
         Long userId = 1L;
+        NewExternalProjectDTO newProjectDTO = new NewExternalProjectDTO();
+        newProjectDTO.setProjectId("project1");
+        newProjectDTO.setName("Project One");
+
         NewExternalProject newProject = new NewExternalProject();
         newProject.setId("project1");
         newProject.setName("Project One");
 
         ExternalProject createdProject = new ExternalProject();
         createdProject.setId("project1");
-        createdProject.setUserId(userId);
         createdProject.setName("Project One");
 
-        when(userProjectService.addProjectToUser(userId, newProject)).thenReturn(CompletableFuture.completedFuture(createdProject));
-
+        when(userProjectService.addProjectToUser(userId, newProjectDTO))
+                .thenReturn(CompletableFuture.completedFuture(createdProject));
+        when(projectMapper.toNewExternalProjectDTO(any())).thenReturn(newProjectDTO);
         Response response = userController.addExternalProject(userId, newProject);
 
         assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
@@ -50,8 +62,13 @@ import static org.mockito.Mockito.*;
     }
 
     @Test
-     void testCreateUser_Success() {
+    void testCreateUser_Success() {
         NewUser newUser = new NewUser();
+        newUser.setEmail("test@example.com");
+        newUser.setPassword("password");
+        newUser.setName("Test User");
+
+        NewUserDTO newUserDTO = new NewUserDTO();
         newUser.setEmail("test@example.com");
         newUser.setPassword("password");
         newUser.setName("Test User");
@@ -61,7 +78,8 @@ import static org.mockito.Mockito.*;
         createdUser.setEmail("test@example.com");
         createdUser.setName("Test User");
 
-        when(userProjectService.createUser(newUser)).thenReturn(CompletableFuture.completedFuture(createdUser));
+        when(userProjectService.createUser(newUserDTO)).thenReturn(CompletableFuture.completedFuture(createdUser));
+        when(userMapper.toNewUserDTO(any())).thenReturn(newUserDTO);
 
         Response response = userController.createUser(newUser);
 
@@ -69,8 +87,8 @@ import static org.mockito.Mockito.*;
         assertEquals(createdUser, response.getEntity());
     }
 
-     @Test
-     void testDeleteUser_Success() {
+    @Test
+    void testDeleteUser_Success() {
         Long userId = 1L;
 
         doNothing().when(userProjectService).deleteUser(userId);
@@ -81,7 +99,7 @@ import static org.mockito.Mockito.*;
     }
 
     @Test
-     void testDeleteUser_NotFound() {
+    void testDeleteUser_NotFound() {
         Long userId = 1L;
 
         doThrow(new RuntimeException()).when(userProjectService).deleteUser(userId);
@@ -92,7 +110,7 @@ import static org.mockito.Mockito.*;
     }
 
     @Test
-     void testGetExternalProjects_Success() {
+    void testGetExternalProjects_Success() {
         Long userId = 1L;
         ExternalProject externalProject = new ExternalProject();
         externalProject.setId("project1");
@@ -108,7 +126,7 @@ import static org.mockito.Mockito.*;
     }
 
     @Test
-     void testGetUserById_Success() {
+    void testGetUserById_Success() {
         Long userId = 1L;
         User user = new User();
         user.setId(userId);
@@ -124,7 +142,7 @@ import static org.mockito.Mockito.*;
     }
 
     @Test
-     void testGetUserById_NotFound() {
+    void testGetUserById_NotFound() {
         Long userId = 1L;
 
         when(userProjectService.getUserById(userId)).thenReturn(CompletableFuture.completedFuture(Optional.empty()));

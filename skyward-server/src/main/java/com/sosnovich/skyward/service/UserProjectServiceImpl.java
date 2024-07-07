@@ -1,14 +1,16 @@
 package com.sosnovich.skyward.service;
 
-import com.sosnovich.skyward.openapi.model.ExternalProject;
-import com.sosnovich.skyward.openapi.model.NewExternalProject;
-import com.sosnovich.skyward.openapi.model.NewUser;
-import com.sosnovich.skyward.openapi.model.User;
+import com.sosnovich.skyward.dto.NewExternalProjectDTO;
+import com.sosnovich.skyward.dto.NewUserDTO;
+import com.sosnovich.skyward.dto.UpdateUserDTO;
+import com.sosnovich.skyward.openapi.model.*;
 import com.sosnovich.skyward.service.api.UserService;
 import com.sosnovich.skyward.service.api.UserValidationService;
 import com.sosnovich.skyward.service.api.ProjectValidationService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
  * Service implementation for handling user and project-related operations.
  */
 @Service
+@Validated
 public class UserProjectServiceImpl implements com.sosnovich.skyward.service.api.UserProjectService {
 
     private final UserService userService;
@@ -45,7 +48,7 @@ public class UserProjectServiceImpl implements com.sosnovich.skyward.service.api
      * @return a CompletableFuture containing the created user
      */
     @Override
-    public CompletableFuture<User> createUser(NewUser newUser) {
+    public CompletableFuture<User> createUser(@Valid NewUserDTO newUser) {
         userValidationService.validateEmailNotInUse(newUser.getEmail());
         return userService.createUser(newUser);
     }
@@ -80,10 +83,9 @@ public class UserProjectServiceImpl implements com.sosnovich.skyward.service.api
      * @return a CompletableFuture containing the added external project
      */
     @Override
-    public CompletableFuture<ExternalProject> addProjectToUser(Long userId, NewExternalProject newProject) {
+    public CompletableFuture<ExternalProject> addProjectToUser(Long userId, @Valid NewExternalProjectDTO newProject) {
         userValidationService.validateUserExists(userId);
-        projectValidationService.validateProjectDoesNotExist(newProject.getId());
-
+        projectValidationService.validateProjectDoesNotExist(newProject.getProjectId());
         return userService.addProjectToUser(userId, newProject);
     }
 
@@ -97,5 +99,18 @@ public class UserProjectServiceImpl implements com.sosnovich.skyward.service.api
     public CompletableFuture<List<ExternalProject>> getProjectsByUserId(Long userId) {
         userValidationService.validateUserExists(userId);
         return userService.getProjectsByUserId(userId);
+    }
+
+    /**
+     * Updates an existing user.
+     *
+     * @param userId the ID of the user to update
+     * @param updatedUser the updated user information
+     * @return a CompletableFuture containing the updated user
+     */
+    @Override
+    public CompletableFuture<Boolean> updateUser(Long userId,@Valid UpdateUserDTO updatedUser) {
+        userValidationService.validateUserExists(userId);
+        return userService.updateUser(userId, updatedUser);
     }
 }

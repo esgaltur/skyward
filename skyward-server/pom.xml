@@ -123,18 +123,6 @@
             <scope>provided</scope>
             <version>${org.mapstruct.version}</version>
         </dependency>
-
-
-
-
-        <!-- Rest Assured -->
-        <dependency>
-            <groupId>io.rest-assured</groupId>
-            <artifactId>rest-assured</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-
     </dependencies>
 
     <build>
@@ -160,7 +148,7 @@
                         <path>
                             <groupId>org.springframework.boot</groupId>
                             <artifactId>spring-boot-configuration-processor</artifactId>
-                            <version>${org.springframework.boot.version}</version>
+                            <version>${spring-boot-dependencies.version}</version>
                         </path>
                         <!-- other annotation processors -->
                     </annotationProcessorPaths>

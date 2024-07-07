@@ -85,6 +85,46 @@ paths:
           $ref: '#/components/responses/UserNotFoundError'
         '500':
           $ref: '#/components/responses/InternalServerError'
+    put:
+      summary: Update user information
+      operationId: updateUser
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: []
+      requestBody:
+        description: Updated user data
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUser'
+            examples:
+              example-1:
+                value:
+                  email: "updateduser@example.com"
+                  password: "updatedpassword123"
+                  name: "Updated User"
+                  role: "ADMIN"
+                  accountExpired: false
+                  accountLocked: false
+                  credentialsExpired: false
+                  disabled: false
+      responses:
+        '200':
+          description: Successfully updated user
+        '400':
+          $ref: '#/components/responses/InvalidInputError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404':
+          $ref: '#/components/responses/UserNotFoundError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
   /users/{id}/projects:
     post:
       summary: Add external project to a user
@@ -139,6 +179,35 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    UpdateUser:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        name:
+          type: string
+        password:
+          type: string
+        role:
+          type: string
+        accountExpired:
+          type: boolean
+        accountLocked:
+          type: boolean
+        credentialsExpired:
+          type: boolean
+        disabled:
+          type: boolean
+      example:
+        email: "updateduser@example.com"
+        name: "Updated User"
+        password: "updatedpassword123"
+        role: "ADMIN"
+        accountExpired: false
+        accountLocked: false
+        credentialsExpired: false
+        disabled: false
     Credentials:
       type: object
       properties:
@@ -508,3 +577,20 @@ components:
               value:
                 error: "Forbidden"
                 message: "You do not have permission to access this resource."
+    UserUpdated:
+      description: Successfully updated user
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+          examples:
+            example-1:
+              value:
+                id: 1
+                email: "updateduser@example.com"
+                name: "Updated User"
