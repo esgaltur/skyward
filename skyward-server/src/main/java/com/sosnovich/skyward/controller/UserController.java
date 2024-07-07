@@ -58,7 +58,7 @@ public class UserController implements UsersApi {
         try {
 
             NewExternalProjectDTO newProjectDTO = projectMapper.toNewExternalProjectDTO(newExternalProject);
-            CompletableFuture<ExternalProject> createdProject = userProjectService.addProjectToUser(id, newProjectDTO);
+            CompletableFuture<ExternalProject> createdProject = userProjectService.assignProjectToUser(id, newProjectDTO);
             var completedProject = createdProject.get();
             return Response.status(Response.Status.CREATED).entity(completedProject).build();
         } catch (ExecutionException | InterruptedException e) {

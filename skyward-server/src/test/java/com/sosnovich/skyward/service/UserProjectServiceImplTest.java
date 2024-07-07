@@ -87,7 +87,7 @@ import static org.mockito.Mockito.*;
     }
 
     @Test
-     void testAddProjectToUser() {
+     void testAssignProjectToUser() {
         Long userId = 1L;
         NewExternalProjectDTO newProject = new NewExternalProjectDTO();
         newProject.setProjectId("projectId");
@@ -100,10 +100,9 @@ import static org.mockito.Mockito.*;
 
         when(userService.addProjectToUser(userId, newProject)).thenReturn(CompletableFuture.completedFuture(externalProject));
 
-        CompletableFuture<ExternalProject> result = userProjectService.addProjectToUser(userId, newProject);
+        CompletableFuture<ExternalProject> result = userProjectService.assignProjectToUser(userId, newProject);
 
         verify(userValidationService).validateUserExists(userId);
-        verify(projectValidationService).validateProjectDoesNotExist("projectId");
         assertEquals(externalProject, result.join());
     }
 

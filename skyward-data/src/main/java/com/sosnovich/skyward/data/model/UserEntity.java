@@ -1,10 +1,10 @@
 package com.sosnovich.skyward.data.model;
 
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.id.IdentityGenerator;
 
-import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -12,6 +12,7 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "tb_user")
+@EqualsAndHashCode
 public class UserEntity {
 
     /**
@@ -75,54 +76,16 @@ public class UserEntity {
     @Column(nullable = false)
     private boolean disabled;
 
+    @Version
+    private int version;
+
+
     /**
      * The set of external projects associated with the user.
      * This field is managed by the {@link UserExternalProjectEntity} entity.
      */
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<UserExternalProjectEntity> externalProjects;
-
-    // Getters and setters
-
-    public Boolean getAccountExpired() {
-        return accountExpired;
-    }
-
-    public void setAccountExpired(Boolean accountExpired) {
-        this.accountExpired = accountExpired;
-    }
-
-    public Boolean getAccountLocked() {
-        return accountLocked;
-    }
-
-    public void setAccountLocked(Boolean accountLocked) {
-        this.accountLocked = accountLocked;
-    }
-
-    public Boolean getCredentialsExpired() {
-        return credentialsExpired;
-    }
-
-    public void setCredentialsExpired(Boolean credentialsExpired) {
-        this.credentialsExpired = credentialsExpired;
-    }
-
-    public Boolean getDisabled() {
-        return disabled;
-    }
-
-    public void setDisabled(Boolean disabled) {
-        this.disabled = disabled;
-    }
-
-    public String getRole() {
-        return role;
-    }
-
-    public void setRole(String role) {
-        this.role = role;
-    }
 
     public Long getId() {
         return id;
@@ -156,33 +119,59 @@ public class UserEntity {
         this.name = name;
     }
 
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public boolean isAccountExpired() {
+        return accountExpired;
+    }
+
+    public void setAccountExpired(boolean accountExpired) {
+        this.accountExpired = accountExpired;
+    }
+
+    public boolean isAccountLocked() {
+        return accountLocked;
+    }
+
+    public void setAccountLocked(boolean accountLocked) {
+        this.accountLocked = accountLocked;
+    }
+
+    public boolean isCredentialsExpired() {
+        return credentialsExpired;
+    }
+
+    public void setCredentialsExpired(boolean credentialsExpired) {
+        this.credentialsExpired = credentialsExpired;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
+    }
+
     public Set<UserExternalProjectEntity> getExternalProjects() {
         return externalProjects;
     }
 
     public void setExternalProjects(Set<UserExternalProjectEntity> externalProjects) {
         this.externalProjects = externalProjects;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        UserEntity that = (UserEntity) o;
-        return accountExpired == that.accountExpired &&
-                accountLocked == that.accountLocked &&
-                credentialsExpired == that.credentialsExpired &&
-                disabled == that.disabled &&
-                Objects.equals(id, that.id) &&
-                Objects.equals(email, that.email) &&
-                Objects.equals(password, that.password) &&
-                Objects.equals(name, that.name) &&
-                Objects.equals(role, that.role) &&
-                Objects.equals(externalProjects, that.externalProjects);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, email, password, name, role, accountExpired, accountLocked, credentialsExpired, disabled, externalProjects);
     }
 }

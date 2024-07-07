@@ -54,10 +54,10 @@ public class JerseyConfig extends ResourceConfig {
         register(ConstraintViolationExceptionMapper.class);
         register(BadCredentialsExceptionMapper.class);
         register(UserNotFoundExceptionMapper.class);
-        register(ProjectAlreadyExistsExceptionMapper.class);
         register(PathParamExceptionMapper.class);
         register(MissingCsrfTokenExceptionExceptionMapper.class);
         register(AccessDeniedExceptionExceptionMapper.class);
+        register(ConcurrencyExceptionExceptionMapper.class);
         register(ExceptionExceptionMapper.class);
     }
 }

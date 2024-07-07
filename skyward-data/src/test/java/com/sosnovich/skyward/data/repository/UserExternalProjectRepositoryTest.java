@@ -74,15 +74,4 @@ class UserExternalProjectRepositoryTest {
         assertFalse(exists);
     }
 
-    @Test
-    void testExistsByProjectId_ProjectExists() {
-        boolean exists = userExternalProjectRepository.existsByProjectId("project1");
-        assertTrue(exists);
-    }
-
-    @Test
-    void testExistsByProjectId_ProjectDoesNotExist() {
-        boolean exists = userExternalProjectRepository.existsByProjectId("project3");
-        assertFalse(exists);
-    }
 }

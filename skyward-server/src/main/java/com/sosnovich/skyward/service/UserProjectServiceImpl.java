@@ -4,6 +4,7 @@ import com.sosnovich.skyward.dto.NewExternalProjectDTO;
 import com.sosnovich.skyward.dto.NewUserDTO;
 import com.sosnovich.skyward.dto.UpdateUserDTO;
 import com.sosnovich.skyward.openapi.model.*;
+import com.sosnovich.skyward.service.api.UserProjectService;
 import com.sosnovich.skyward.service.api.UserService;
 import com.sosnovich.skyward.service.api.UserValidationService;
 import com.sosnovich.skyward.service.api.ProjectValidationService;
@@ -14,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -21,12 +23,12 @@ import java.util.concurrent.CompletableFuture;
  */
 @Service
 @Validated
-public class UserProjectServiceImpl implements com.sosnovich.skyward.service.api.UserProjectService {
+public class UserProjectServiceImpl implements UserProjectService {
 
     private final UserService userService;
     private final UserValidationService userValidationService;
     private final ProjectValidationService projectValidationService;
-
+    private final WeakHashMap<Long, User> userCache = new WeakHashMap<>();
     /**
      * Constructs a new UserProjectServiceImpl.
      *
@@ -61,7 +63,15 @@ public class UserProjectServiceImpl implements com.sosnovich.skyward.service.api
      */
     @Override
     public CompletableFuture<Optional<User>> getUserById(Long id) {
-        return userService.getUserById(id);
+        User cachedUser = userCache.get(id);
+        if (cachedUser != null) {
+            return CompletableFuture.completedFuture(Optional.of(cachedUser));
+        }
+
+        return userService.getUserById(id).thenApply(userOpt -> {
+            userOpt.ifPresent(user -> userCache.put(id, user));
+            return userOpt;
+        });
     }
 
     /**
@@ -83,9 +93,9 @@ public class UserProjectServiceImpl implements com.sosnovich.skyward.service.api
      * @return a CompletableFuture containing the added external project
      */
     @Override
-    public CompletableFuture<ExternalProject> addProjectToUser(Long userId, @Valid NewExternalProjectDTO newProject) {
+    public CompletableFuture<ExternalProject> assignProjectToUser(Long userId, @Valid NewExternalProjectDTO newProject) {
         userValidationService.validateUserExists(userId);
-        projectValidationService.validateProjectDoesNotExist(newProject.getProjectId());
+        projectValidationService.isProjectAssignedToUser(userId,newProject.getProjectId());
         return userService.addProjectToUser(userId, newProject);
     }
 

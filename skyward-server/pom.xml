@@ -31,8 +31,10 @@
         <skyward-tracing.version>0.0.1-SNAPSHOT</skyward-tracing.version>
         <skyward-openapi.version>0.0.1-SNAPSHOT</skyward-openapi.version>
         <bcprov-jdk18on.version>${bcutil-jdk15on.version}</bcprov-jdk18on.version>
-        <jjwt.version>0.12.3</jjwt.version>
-        <spring-security-jwt.version>1.1.1.RELEASE</spring-security-jwt.version>
+        <jjwt.version>[0.12.3,)</jjwt.version>
+        <spring-security-jwt.version>[1.1.1.RELEASE,)</spring-security-jwt.version>
+
+        <resilience4j-spring-boot3.version>[2.2.0,)</resilience4j-spring-boot3.version>
     </properties>
     <dependencies>
         <dependency>
@@ -123,6 +125,15 @@
             <scope>provided</scope>
             <version>${org.mapstruct.version}</version>
         </dependency>
+
+        <!-- https://mvnrepository.com/artifact/io.github.resilience4j/resilience4j-spring-boot3 -->
+        <dependency>
+            <groupId>io.github.resilience4j</groupId>
+            <artifactId>resilience4j-spring-boot3</artifactId>
+            <version>${resilience4j-spring-boot3.version}</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

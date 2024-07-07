@@ -5,15 +5,21 @@ import com.sosnovich.skyward.data.model.UserExternalProjectEntity;
 import com.sosnovich.skyward.data.repository.UserExternalProjectRepository;
 import com.sosnovich.skyward.data.repository.UserRepository;
 import com.sosnovich.skyward.dto.*;
+import com.sosnovich.skyward.exc.ConcurrencyException;
 import com.sosnovich.skyward.mapping.ProjectMapper;
 import com.sosnovich.skyward.mapping.UserMapper;
 import com.sosnovich.skyward.openapi.model.*;
 import com.sosnovich.skyward.service.api.UserService;
+
+import io.github.resilience4j.retry.annotation.Retry;
+import jakarta.persistence.OptimisticLockException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -41,8 +47,8 @@ public class UserServiceImpl implements UserService {
      * @param bCryptPasswordEncoder         the password encoder
      */
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserExternalProjectRepository userExternalProjectRepository, UserMapper userMapper, ProjectMapper projectMapper,
-                           PasswordEncoder bCryptPasswordEncoder) {
+    public UserServiceImpl(UserRepository userRepository, UserExternalProjectRepository userExternalProjectRepository,
+                           UserMapper userMapper, ProjectMapper projectMapper, PasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.userExternalProjectRepository = userExternalProjectRepository;
         this.userMapper = userMapper;
@@ -90,9 +96,25 @@ public class UserServiceImpl implements UserService {
      * @param userId the ID of the user to delete
      */
     @Async
+    @Transactional
+    @Retry(name = "deleteUser", fallbackMethod = "deleteUserFallback")
     @Override
     public void deleteUser(Long userId) {
-        userRepository.deleteById(userId);
+        try {
+            userRepository.deleteById(userId);
+        } catch (OptimisticLockException e) {
+            throw new ConcurrencyException("The user record you are trying to delete has been modified by another transaction. Please try again.");
+        }
+    }
+
+    /**
+     * Fallback method for deleteUser in case of retry failure.
+     *
+     * @param userId the ID of the user to delete
+     * @param t      the throwable that caused the fallback
+     */
+    public void deleteUserFallback(Long userId, Throwable t) {
+        throw new ConcurrencyException("The user record you are trying to delete could not be processed due to concurrent modification. Please try again later.");
     }
 
     /**
@@ -103,18 +125,34 @@ public class UserServiceImpl implements UserService {
      * @return a CompletableFuture containing the added external project
      */
     @Async
+    @Retry(name = "addProjectToUser", fallbackMethod = "addProjectToUserFallback")
     @Override
     public CompletableFuture<ExternalProject> addProjectToUser(Long userId, NewExternalProjectDTO newProject) {
         return CompletableFuture.supplyAsync(() -> {
-
             UserEntity userEntity = userRepository.findById(userId)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
             UserExternalProjectEntity projectEntity = projectMapper.toEntity(newProject);
             projectEntity.setUser(userEntity);
-            UserExternalProjectEntity savedProjectEntity = userExternalProjectRepository.save(projectEntity);
-            ExternalProjectDTO externalProjectDTO = projectMapper.toDTO(savedProjectEntity);
-            return projectMapper.toApiModel(externalProjectDTO);
+            try {
+                UserExternalProjectEntity savedProjectEntity = userExternalProjectRepository.save(projectEntity);
+                ExternalProjectDTO externalProjectDTO = projectMapper.toDTO(savedProjectEntity);
+                return projectMapper.toApiModel(externalProjectDTO);
+            } catch (OptimisticLockException e) {
+                throw new ConcurrencyException("The project record you are trying to add has been modified by another transaction. Please try again.");
+            }
         });
+    }
+
+    /**
+     * Fallback method for addProjectToUser in case of retry failure.
+     *
+     * @param userId     the ID of the user to add the project to
+     * @param newProject the new external project to add
+     * @param t          the throwable that caused the fallback
+     * @return a CompletableFuture containing the fallback result
+     */
+    public CompletableFuture<ExternalProject> addProjectToUserFallback(Long userId, NewExternalProjectDTO newProject, Throwable t) {
+        throw new ConcurrencyException("The project record you are trying to add could not be processed due to concurrent modification. Please try again later.");
     }
 
     /**
@@ -140,18 +178,41 @@ public class UserServiceImpl implements UserService {
      * @return a CompletableFuture containing the updated user
      */
     @Async
+    @Transactional
+    @Retry(name = "updateUser", fallbackMethod = "updateUserFallback")
     @Override
     public CompletableFuture<Boolean> updateUser(Long userId, UpdateUserDTO updatedUser) {
         return CompletableFuture.supplyAsync(() -> {
             UserEntity userEntity = userRepository.findById(userId)
                     .orElseThrow(() -> new UsernameNotFoundException("User not found with ID: " + userId));
-
             if (updatedUser.getPassword() != null) {
                 updatedUser.setPassword(bCryptPasswordEncoder.encode(updatedUser.getPassword()));
             }
             userMapper.updateUserFromDto(updatedUser, userEntity);
-            userRepository.save(userEntity);
-            return true;
+            try {
+                userRepository.save(userEntity);
+                return true;
+            } catch (OptimisticLockException e) {
+                throw new ConcurrencyException("The user record you are trying to update has been modified by another transaction. Please try again.");
+            }
         });
+    }
+
+    /**
+     * Fallback method for updateUser in case of retry failure.
+     *
+     * @param userId      the ID of the user toContinuing from where the code snippet ended, here's the complete `UserServiceImpl` class with detailed Javadoc comments, including the final part of the updateUserFallback method:
+
+    ```java
+    /**
+     * Fallback method for updateUser in case of retry failure.
+     *
+     * @param userId      the ID of the user to update
+     * @param updatedUser the updated user information
+     * @param t           the throwable that caused the fallback
+     * @return a CompletableFuture containing the fallback result
+     */
+    public CompletableFuture<Boolean> updateUserFallback(Long userId, UpdateUserDTO updatedUser, Throwable t) {
+        throw new ConcurrencyException("The user record you are trying to update could not be processed due to concurrent modification. Please try again later.");
     }
 }

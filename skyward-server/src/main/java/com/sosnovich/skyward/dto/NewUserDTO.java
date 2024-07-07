@@ -1,6 +1,8 @@
 package com.sosnovich.skyward.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,7 +22,9 @@ public class NewUserDTO {
     /**
      * The email address of the new user.
      */
+    @Valid
     @Email
+    @NotBlank
     private String email;
 
     /**

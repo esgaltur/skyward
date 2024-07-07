@@ -3,6 +3,13 @@ info:
   title: User and Project Management API
   description: API for managing users and their external projects
   version: 1.0.0
+  contact:
+    name: Dmitriy Sosnovich
+    url: http://sosnovich.com
+    email: dmitriy@sosnovich.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 servers:
   - url: http://localhost:8080/api
     description: Local server
@@ -32,7 +39,7 @@ paths:
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '409':
-          $ref: '#/components/responses/EmailInUseError'
+          $ref: '#/components/responses/UsersConflict409Error'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /users/{id}:
@@ -81,6 +88,8 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         '403':
           $ref: '#/components/responses/ForbiddenError'
+        '409':
+          $ref: '#/components/responses/ConcurrencyError'
         '404':
           $ref: '#/components/responses/UserNotFoundError'
         '500':
@@ -123,6 +132,8 @@ paths:
           $ref: '#/components/responses/ForbiddenError'
         '404':
           $ref: '#/components/responses/UserNotFoundError'
+        '409':
+          $ref: '#/components/responses/ConcurrencyError'
         '500':
           $ref: '#/components/responses/InternalServerError'
   /users/{id}/projects:
@@ -145,7 +156,7 @@ paths:
         '400':
           $ref: '#/components/responses/InvalidInputError'
         '409':
-          $ref: '#/components/responses/ProjectAlreadyExistsError'
+          $ref: '#/components/responses/UserProjectsConflict409Error'
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '500':
@@ -320,7 +331,7 @@ components:
         rejectedValue:
           type: string
           example: "null"
-    ProjectAlreadyExistBody:
+    ProjectAlreadyAssignedBody:
       type: object
       properties:
         error:
@@ -332,6 +343,15 @@ components:
         error:
           type: string
           example: "Unauthorized access. Please provide valid credentials."
+    ConcurrencyExceptionBody:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Concurrency Conflict"
+        message:
+          type: string
+          example: "This resource was modified by another user. Please try again."
   requestBodies:
     Credentials:
       description: User credentials
@@ -531,7 +551,7 @@ components:
             example-1:
               value:
                 error: "Email is already in use"
-    ProjectAlreadyExistsError:
+    UserHasProjectAlreadyAssigned:
       description: Project already exists
       headers:
         trace.id:
@@ -541,11 +561,37 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ProjectAlreadyExistBody"
+            $ref: "#/components/schemas/ProjectAlreadyAssignedBody"
           examples:
             example-1:
               value:
                 error: "Project with id [project1] already exists"
+    UserProjectsConflict409Error:
+      description: Conflict 409 error responses possible
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/ProjectAlreadyAssignedBody'
+              - $ref: '#/components/schemas/ConcurrencyExceptionBody'
+    UsersConflict409Error:
+      description: Conflict 409 error for users post resource responses possible
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/EmailInUseErrorBody'
+              - $ref: '#/components/schemas/ConcurrencyExceptionBody'
     InternalServerError:
       description: Internal Server Error
       headers:
@@ -594,3 +640,19 @@ components:
                 id: 1
                 email: "updateduser@example.com"
                 name: "Updated User"
+    ConcurrencyError:
+      description: Concurrency conflict error
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConcurrencyExceptionBody'
+          examples:
+            example-1:
+              value:
+                error: "Concurrency Conflict"
+                message: "This resource was modified by another user. Please try again."

@@ -4,10 +4,8 @@ import com.sosnovich.skyward.data.model.UserEntity;
 import com.sosnovich.skyward.data.model.UserExternalProjectEntity;
 import com.sosnovich.skyward.data.repository.UserExternalProjectRepository;
 import com.sosnovich.skyward.data.repository.UserRepository;
-import com.sosnovich.skyward.dto.ExternalProjectDTO;
-import com.sosnovich.skyward.dto.NewExternalProjectDTO;
-import com.sosnovich.skyward.dto.NewUserDTO;
-import com.sosnovich.skyward.dto.UserDTO;
+import com.sosnovich.skyward.dto.*;
+import com.sosnovich.skyward.exc.ConcurrencyException;
 import com.sosnovich.skyward.mapping.ProjectMapper;
 import com.sosnovich.skyward.mapping.UserMapper;
 import com.sosnovich.skyward.mapping.UserMapperImpl;
@@ -15,6 +13,7 @@ import com.sosnovich.skyward.openapi.model.ExternalProject;
 import com.sosnovich.skyward.openapi.model.NewExternalProject;
 import com.sosnovich.skyward.openapi.model.NewUser;
 import com.sosnovich.skyward.openapi.model.User;
+import jakarta.persistence.OptimisticLockException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,9 +25,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+
 @Import(UserMapperImpl.class)
  class UserServiceImplTest {
 
@@ -259,4 +260,60 @@ import static org.mockito.Mockito.*;
         List<ExternalProject> projects = result.join();
         assertTrue(projects.isEmpty());
     }
+
+   @Test
+   void testDeleteUserThrowsConcurrencyException() {
+      Long userId = 1L;
+
+      doThrow(new OptimisticLockException()).when(userRepository).deleteById(userId);
+
+      ConcurrencyException exception = assertThrows(ConcurrencyException.class, () -> {
+         userService.deleteUser(userId);
+      });
+
+      assertEquals("The user record you are trying to delete has been modified by another transaction. Please try again.", exception.getMessage());
+   }
+
+   @Test
+   void testAddProjectToUserThrowsConcurrencyException() {
+      Long userId = 1L;
+      NewExternalProjectDTO newProject = new NewExternalProjectDTO();
+      newProject.setName("New Project");
+      newProject.setProjectId("proj-123");
+
+      UserEntity userEntity = new UserEntity();
+      when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+      when(projectMapper.toEntity(newProject)).thenReturn(new UserExternalProjectEntity());
+      doThrow(new OptimisticLockException()).when(userExternalProjectRepository).save(any(UserExternalProjectEntity.class));
+
+      // First, get the CompletableFuture
+      CompletableFuture<ExternalProject> future = userService.addProjectToUser(userId, newProject);
+
+      // Then, test the join() method separately to ensure only one method is tested for exception
+      CompletionException exception = assertThrows(CompletionException.class, future::join);
+
+      Throwable cause = exception.getCause();
+      assertEquals(ConcurrencyException.class, cause.getClass());
+      assertEquals("The project record you are trying to add has been modified by another transaction. Please try again.", cause.getMessage());
+   }
+   @Test
+   void testUpdateUserThrowsConcurrencyException() {
+      Long userId = 1L;
+      UpdateUserDTO updatedUser = new UpdateUserDTO("updated@example.com", "newpassword", "Updated User", "ROLE_USER", false, false, false, false);
+
+      UserEntity userEntity = new UserEntity();
+      when(userRepository.findById(userId)).thenReturn(Optional.of(userEntity));
+      doThrow(new OptimisticLockException()).when(userRepository).save(any(UserEntity.class));
+
+      // First, get the CompletableFuture
+      CompletableFuture<Boolean> future = userService.updateUser(userId, updatedUser);
+
+      // Then, test the join() method separately to ensure only one method is tested for exception
+      CompletionException exception = assertThrows(CompletionException.class, future::join);
+
+      Throwable cause = exception.getCause();
+      assertEquals(ConcurrencyException.class, cause.getClass());
+      assertEquals("The user record you are trying to update has been modified by another transaction. Please try again.", cause.getMessage());
+   }
+
 }

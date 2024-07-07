@@ -52,7 +52,7 @@ class UserControllerTest {
         createdProject.setId("project1");
         createdProject.setName("Project One");
 
-        when(userProjectService.addProjectToUser(userId, newProjectDTO))
+        when(userProjectService.assignProjectToUser(userId, newProjectDTO))
                 .thenReturn(CompletableFuture.completedFuture(createdProject));
         when(projectMapper.toNewExternalProjectDTO(any())).thenReturn(newProjectDTO);
         Response response = userController.addExternalProject(userId, newProject);
