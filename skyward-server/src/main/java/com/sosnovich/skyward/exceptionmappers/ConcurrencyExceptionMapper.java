@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * HTTP 409 Conflict response.
  */
 @Component
-public class ConcurrencyExceptionExceptionMapper implements ExceptionMapper<ConcurrencyException> {
+public class ConcurrencyExceptionMapper implements ExceptionMapper<ConcurrencyException> {
 
     /**
      * Converts a {@link ConcurrencyException} to a HTTP 409 Conflict response.

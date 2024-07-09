@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  */
 @Provider
 @Component
-public class AccessDeniedExceptionExceptionMapper implements ExceptionMapper<AccessDeniedException> {
+public class AccessDeniedExceptionMapper implements ExceptionMapper<AccessDeniedException> {
 
     /**
      * Converts an {@link AccessDeniedException} into an HTTP 403 Forbidden

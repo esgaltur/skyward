@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  */
 @Provider
 @Component
-public class MissingCsrfTokenExceptionExceptionMapper implements ExceptionMapper<MissingCsrfTokenException> {
+public class MissingCsrfTokenExceptionMapper implements ExceptionMapper<MissingCsrfTokenException> {
 
     /**
      * Converts a {@link MissingCsrfTokenException} into an HTTP 403 Forbidden

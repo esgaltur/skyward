@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
  * Exception mapper for handling NotFoundException and returning an appropriate response.
  */
 @Component
-public class NotFoundExceptionExceptionMapper implements ExceptionMapper<NotFoundException> {
+public class NotFoundExceptionMapper implements ExceptionMapper<NotFoundException> {
 
     /**
      * Maps a NotFoundException to a HTTP response.

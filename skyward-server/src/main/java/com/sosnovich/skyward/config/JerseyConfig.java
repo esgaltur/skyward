@@ -45,19 +45,22 @@ public class JerseyConfig extends ResourceConfig {
     }
 
     private void registerExceptionMappers() {
-        register(MultithreadExceptionExceptionMapper.class);
-        register(UsernameNotFoundExceptionExceptionMapper.class);
-        register(NotFoundExceptionExceptionMapper.class);
+        register(MultithreadExceptionMapper.class);
+        register(UsernameNotFoundExceptionMapper.class);
+        register(NotFoundExceptionMapper.class);
         register(EmailAlreadyInUseExceptionMapper.class);
-        register(AuthorizationDeniedExceptionExceptionMapper.class);
+        register(AuthorizationDeniedExceptionMapper.class);
         register(ForbiddenExceptionMapper.class);
         register(ConstraintViolationExceptionMapper.class);
         register(BadCredentialsExceptionMapper.class);
         register(UserNotFoundExceptionMapper.class);
         register(PathParamExceptionMapper.class);
-        register(MissingCsrfTokenExceptionExceptionMapper.class);
-        register(AccessDeniedExceptionExceptionMapper.class);
-        register(ConcurrencyExceptionExceptionMapper.class);
+        register(MissingCsrfTokenExceptionMapper.class);
+        register(AccessDeniedExceptionMapper.class);
+        register(ConcurrencyExceptionMapper.class);
+        register(JsonProcessingExceptionMapper.class);
+        register(JsonDeserializationExceptionMapper.class);
+        register(MIstmatchExceptionMapper.class);
         register(ExceptionExceptionMapper.class);
     }
 }

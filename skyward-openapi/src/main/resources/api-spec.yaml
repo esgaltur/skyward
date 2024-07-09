@@ -35,7 +35,7 @@ paths:
         '201':
           $ref: '#/components/responses/UserCreated'
         '400':
-          $ref: '#/components/responses/InvalidInputError'
+          $ref: '#/components/responses/InvalidInput400Error'
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '409':
@@ -127,7 +127,7 @@ paths:
         '200':
           description: Successfully updated user
         '400':
-          $ref: '#/components/responses/InvalidInputError'
+          $ref: '#/components/responses/InvalidInput400Error'
         '403':
           $ref: '#/components/responses/ForbiddenError'
         '404':
@@ -154,7 +154,7 @@ paths:
         '201':
           $ref: '#/components/responses/ExternalProjectCreated'
         '400':
-          $ref: '#/components/responses/InvalidInputError'
+          $ref: '#/components/responses/InvalidInput400Error'
         '409':
           $ref: '#/components/responses/UserProjectsConflict409Error'
         '403':
@@ -319,7 +319,7 @@ components:
         error:
           type: string
           example: "Email is already in use"
-    InvalidInputErrorBody:
+    ValidationError:
       type: object
       properties:
         field:
@@ -331,6 +331,19 @@ components:
         rejectedValue:
           type: string
           example: "null"
+    InvalidInputError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "invalid json value"
+        line:
+          type: integer
+          example: 3
+        column:
+          type: integer
+          example: 4
+
     ProjectAlreadyAssignedBody:
       type: object
       properties:
@@ -526,7 +539,7 @@ components:
           schema:
             type: array
             items:
-              $ref: "#/components/schemas/InvalidInputErrorBody"
+              $ref: "#/components/schemas/ValidationError"
           examples:
             example-1:
               value:
@@ -579,6 +592,19 @@ components:
             oneOf:
               - $ref: '#/components/schemas/ProjectAlreadyAssignedBody'
               - $ref: '#/components/schemas/ConcurrencyExceptionBody'
+    InvalidInput400Error:
+      description: Conflict 409 error for users post resource responses possible
+      headers:
+        trace.id:
+          description: Trace ID for the request
+          schema:
+            type: string
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/ValidationError'
+              - $ref: '#/components/schemas/InvalidInputError'
     UsersConflict409Error:
       description: Conflict 409 error for users post resource responses possible
       headers:

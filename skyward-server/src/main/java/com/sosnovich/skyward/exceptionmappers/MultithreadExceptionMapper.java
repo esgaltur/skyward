@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Slf4j
-public class MultithreadExceptionExceptionMapper implements ExceptionMapper<MultithreadingException> {
+public class MultithreadExceptionMapper implements ExceptionMapper<MultithreadingException> {
 
     /**
      * Maps a MultithreadingException to a HTTP response.

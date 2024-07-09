@@ -1,6 +1,6 @@
 package com.sosnovich.skyward.exceptionmappers;
 
-import com.sosnovich.skyward.openapi.model.InvalidInputErrorBody;
+import com.sosnovich.skyward.openapi.model.ValidationError;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.ws.rs.core.Response;
@@ -24,7 +24,7 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
      */
     @Override
     public Response toResponse(ConstraintViolationException exception) {
-        List<InvalidInputErrorBody> errorMessage = exception.getConstraintViolations().stream()
+        List<ValidationError> errorMessage = exception.getConstraintViolations().stream()
                 .map(this::mapViolationToValidationError)
                 .toList();
 
@@ -34,15 +34,15 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
     }
 
     /**
-     * Maps a {@link ConstraintViolation} to an {@link InvalidInputErrorBody}.
+     * Maps a {@link ConstraintViolation} to an {@link ValidationError}.
      *
      * @param violation the constraint violation to map
      * @return the corresponding InvalidInputErrorBody
      */
-    private InvalidInputErrorBody mapViolationToValidationError(ConstraintViolation<?> violation) {
+    private ValidationError mapViolationToValidationError(ConstraintViolation<?> violation) {
         String field = violation.getPropertyPath().toString();
         String message = violation.getMessage();
         Object rejectedValue = violation.getInvalidValue();
-        return new InvalidInputErrorBody(field, message, rejectedValue == null ? "null" : rejectedValue.toString());
+        return new ValidationError(field, message, rejectedValue == null ? "null" : rejectedValue.toString());
     }
 }

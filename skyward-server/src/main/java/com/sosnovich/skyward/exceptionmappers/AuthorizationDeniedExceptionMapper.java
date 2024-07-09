@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 
-public class AuthorizationDeniedExceptionExceptionMapper implements ExceptionMapper<AuthorizationDeniedException> {
+public class AuthorizationDeniedExceptionMapper implements ExceptionMapper<AuthorizationDeniedException> {
 
     /**
      * Converts an AuthorizationDeniedException into an HTTP 403 Forbidden response.

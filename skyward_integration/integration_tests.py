@@ -124,6 +124,15 @@ class TestUserProjectManagementAPI(unittest.TestCase):
         self.assertEqual("must be a well-formed email address", response.json()[0]["message"])
         self.assertEqual("newuser22example.com", response.json()[0]["rejectedValue"])
 
+    def test_create_user_invalid_input_json(self):
+
+        response = self.session.post(self.users_url,
+                                     json='{"email" "newuser22example.com","password": "newpassword123", "name": "New User 2"}',
+                                     headers=self.admin_headers,
+                                     cert=(cert_path, private_key), verify=False)
+        self.assertEqual(400, response.status_code)
+        print( response.text)
+
     def test_authenticate_user(self):
         self.instance_authenticate_admin()
 

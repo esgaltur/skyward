@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
  * Exception mapper for handling UsernameNotFoundException and returning an appropriate response.
  */
 @Component
-public class UsernameNotFoundExceptionExceptionMapper implements ExceptionMapper<UsernameNotFoundException> {
+public class UsernameNotFoundExceptionMapper implements ExceptionMapper<UsernameNotFoundException> {
 
     /**
      * Maps a UsernameNotFoundException to a HTTP response.
