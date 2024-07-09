@@ -1,12 +1,12 @@
 package com.sosnovich.skyward.security;
 
+import com.sosnovich.skyward.config.SkywardCorsProperty;
 import com.sosnovich.skyward.security.api.JwtTokenProvider;
 import com.sosnovich.skyward.security.filter.JwtTokenJerseyFilter;
 import com.sosnovich.skyward.security.filter.CsrfSecurityFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,8 +24,6 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 
-import java.util.List;
-
 /**
  * Security configuration class for the application.
  * This class sets up security-related beans and configurations for the Spring Security framework.
@@ -37,6 +35,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final SkywardCorsProperty skywardCorsProperty;
 
     /**
      * Constructs a new SecurityConfig with the specified UserDetailsService and JwtTokenProvider.
@@ -45,9 +44,10 @@ public class SecurityConfig {
      * @param jwtTokenProvider   the provider for JWT tokens
      */
     @Autowired
-    public SecurityConfig(UserDetailsService userDetailsService, JwtTokenProvider jwtTokenProvider) {
+    public SecurityConfig(UserDetailsService userDetailsService, JwtTokenProvider jwtTokenProvider, SkywardCorsProperty skywardCorsProperty) {
         this.userDetailsService = userDetailsService;
         this.jwtTokenProvider = jwtTokenProvider;
+        this.skywardCorsProperty = skywardCorsProperty;
     }
 
     /**
@@ -73,20 +73,18 @@ public class SecurityConfig {
                 .csrf(csrf ->
                         csrf.csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                                .ignoringRequestMatchers("/api/auth/**")
+                                .ignoringRequestMatchers("/api/auth/**","/actuator/**")
                 )
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 )
                 .cors(httpSecurityCorsConfigurer -> httpSecurityCorsConfigurer.configurationSource(request -> {
                     CorsConfiguration corsConfiguration = new CorsConfiguration();
-                    corsConfiguration.setAllowCredentials(true);
-                    corsConfiguration.setAllowedOrigins(List.of("*"));
-                    corsConfiguration.setAllowedHeaders(List.of("*"));
-                    corsConfiguration.setAllowedMethods(List.of(HttpMethod.GET.name(), HttpMethod.POST.name(),HttpMethod.PUT.name(),
-                            HttpMethod.DELETE.name(),
-                            HttpMethod.OPTIONS.name()));
-                    corsConfiguration.setMaxAge(36000L);
+                    corsConfiguration.setAllowCredentials(skywardCorsProperty.allowCredentials());
+                    corsConfiguration.setAllowedOrigins(skywardCorsProperty.allowedOrigins());
+                    corsConfiguration.setAllowedHeaders(skywardCorsProperty.allowedHeaders());
+                    corsConfiguration.setAllowedMethods(skywardCorsProperty.allowedMethods());
+                    corsConfiguration.setMaxAge(skywardCorsProperty.maxAge());
                     return corsConfiguration;
 
                 }))
