@@ -6,6 +6,7 @@ import com.sosnovich.skyward.tracing.OpenTelemetryConfig;
 import io.undertow.UndertowOptions;
 import org.glassfish.jersey.servlet.ServletContainer;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.embedded.undertow.UndertowServletWebServerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -24,6 +25,7 @@ import static io.undertow.servlet.Servlets.servlet;
 @EnableAutoConfiguration
 @ComponentScan(basePackageClasses = SkywardServerConfiguration.class)
 @EnableAsync
+@EnableConfigurationProperties(SkywardCorsProperty.class)
 public class SkywardServerConfiguration {
     /**
      * Configures the Undertow Servlet Web Server Factory.
